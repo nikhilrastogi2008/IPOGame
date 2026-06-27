@@ -425,6 +425,11 @@ let unsubListeners=[];
 
 // ── instructor ────────────────────────────────────────────────────────────────
 function goInstructor(){
+  const pwd = prompt('Enter instructor password:');
+  if(pwd !== 'SA2026'){
+    alert('Incorrect password.');
+    return;
+  }
   myRole='instructor';
   document.getElementById('hpill-role').textContent='Instructor';
   showScreen('screen-instructor'); showItab('itab-setup');

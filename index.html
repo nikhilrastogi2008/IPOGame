@@ -580,6 +580,7 @@ async function closeBookCalc(cfg, students, bids){
   }
   students.forEach(s=>{if(allottedMap[s.id]===undefined)allottedMap[s.id]=0;});
   const eligibleShares=Object.values(allottedMap).reduce((a,v)=>a+v,0);
+  const ratio=cfg.shares>0?eligibleShares/cfg.shares:0;
 
   const allotments={};
   students.forEach(s=>{

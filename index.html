@@ -529,11 +529,22 @@ async function listenBids(){
 
 async function closeBook(){
   setLoading('btn-close-book',true,'Calculating…');
-  // Single read for entire room — much faster than 3 separate calls
-  const roomData=await dbGet(`rooms/${myRoomCode}`);
-  const cfg=roomData.config;
-  const students=roomData.students?Object.values(roomData.students):[];
-  const bids=roomData.bids||{};
+  try {
+    // Step 1: read room
+    const roomData=await dbGet(`rooms/${myRoomCode}`);
+    if(!roomData){ alert('Error: Could not read room data. Check Firebase rules.'); setLoading('btn-close-book',false,'Close book & reveal results →'); return; }
+    const cfg=roomData.config;
+    if(!cfg){ alert('Error: No config found in room.'); setLoading('btn-close-book',false,'Close book & reveal results →'); return; }
+    const students=roomData.students?Object.values(roomData.students):[];
+    const bids=roomData.bids||{};
+    closeBookCalc(cfg, students, bids);
+  } catch(e) {
+    alert('Error reading from Firebase: ' + e.message);
+    setLoading('btn-close-book',false,'Close book & reveal results →');
+  }
+}
+
+async function closeBookCalc(cfg, students, bids){
 
   // ── Book building cut-off logic ──────────────────────────────────────────
   // ── Correct book building allotment logic ──────────────────────────────
@@ -611,11 +622,10 @@ async function closeBook(){
     ]);
     showFinalResults(cfg, results, students, bids);
   } catch(err) {
-    console.error('Write failed:', err);
-    alert('Error saving results: ' + err.message + '\n\nCheck Firebase rules allow writes.');
+    alert('Error saving to Firebase: ' + err.message + '\n\nCheck Firebase rules allow writes.');
     setLoading('btn-close-book', false, 'Close book & reveal results →');
   }
-}
+} // end closeBookCalc
 
 function renderLeaderboard(cfg,results,students,bids,el){
   const {allotments,ranked}=results;

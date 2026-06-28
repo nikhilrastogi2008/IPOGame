@@ -237,8 +237,20 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
     </div>
     <div id="results-final" style="display:none">
       <div id="final-summary"></div><div id="final-table"></div>
+      <div class="card" style="background:var(--warn-bg);border-color:var(--warn-border);margin-top:0">
+        <h3 style="color:var(--warn);margin-bottom:8px">&#x1F4C8; Set listing/market price</h3>
+        <p style="font-size:13px;margin-bottom:12px">Enter the market price at which the stock is now trading. Wealth = allotted shares &times; market price + unused cash.</p>
+        <div style="display:flex;gap:12px;align-items:flex-end">
+          <div class="form-group" style="flex:1">
+            <label>Market / listing price (&#8377;)</label>
+            <input type="number" id="market-price" placeholder="e.g. 125" min="0" step="0.01"/>
+          </div>
+          <button class="btn primary" onclick="applyMarketPrice()">Apply &amp; update leaderboard</button>
+        </div>
+      </div>
       <div class="btn-row">
         <button class="btn primary" onclick="showItab('itab-leaderboard')">&#x1F3C6; View leaderboard &rarr;</button>
+        <button class="btn" onclick="downloadCSV()">&#x2B07; Download results (CSV)</button>
         <button class="btn danger-btn" onclick="endGame()">End game</button>
       </div>
     </div>
@@ -257,7 +269,10 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
         <h3 style="color:var(--accent);margin-bottom:8px">Strategy debrief</h3>
         <div id="lb-debrief" style="font-size:13px;color:var(--ink2)"></div>
       </div>
-      <div class="btn-row"><button class="btn danger-btn" onclick="endGame()">End game</button></div>
+      <div class="btn-row">
+        <button class="btn" onclick="downloadCSV()">&#x2B07; Download results (CSV)</button>
+        <button class="btn danger-btn" onclick="endGame()">End game</button>
+      </div>
     </div>
   </div>
 </div>
@@ -655,6 +670,7 @@ function renderLeaderboard(cfg,results,students,bids,el){
 }
 
 function showFinalResults(cfg,results,students,bids){
+  currentCfg=cfg; currentResults=results; currentStudents=students; currentBids=bids;
   document.getElementById('results-live').style.display='none';
   document.getElementById('results-final').style.display='block';
   const {allotments,ranked,cutoffPrice,eligibleShares,ratio}=results;
@@ -918,6 +934,121 @@ function showStudentResult(cfg,results,al,b,students,bids){
   document.getElementById('student-leaderboard-section').style.display='block';
   renderLeaderboard(cfg,results,students,bids,document.getElementById('student-lb-rows'));
 }
+// --- Market price & CSV ---
+let currentResults = null;
+let currentCfg = null;
+let currentStudents = null;
+let currentBids = null;
+let appliedMarketPrice = null;
+
+function applyMarketPrice() {
+  const mp = parseFloat(document.getElementById('market-price').value);
+  if (!mp || mp <= 0) { alert('Please enter a valid market price.'); return; }
+  if (!currentResults || !currentStudents) { alert('Close the book first to generate results.'); return; }
+  appliedMarketPrice = mp;
+
+  // Recalculate wealth using market price
+  const al = currentResults.allotments || {};
+  const cfg = currentCfg;
+  currentStudents.forEach(s => {
+    const a = al[s.id];
+    if (!a) return;
+    const sharesValue = (a.allotted || 0) * mp;
+    const unusedCash = a.unused || cfg.funds;
+    a.totalWealth = sharesValue + unusedCash;
+    a.marketValue = sharesValue;
+    a.marketPrice = mp;
+  });
+
+  // Re-rank
+  const ranked = [...currentStudents].sort((a,b) =>
+    (al[b.id]||{}).totalWealth - (al[a.id]||{}).totalWealth
+  );
+  ranked.forEach((s,i) => { if(al[s.id]) al[s.id].rank = i+1; });
+  currentResults.ranked = ranked.map(s=>s.id);
+  currentResults.marketPrice = mp;
+
+  // Update leaderboard
+  renderLeaderboard(currentCfg, currentResults, currentStudents, currentBids, document.getElementById('lb-rows'));
+
+  // Update lb-header
+  const winnerName = (currentResults.ranked && currentResults.ranked[0])
+    ? (currentStudents.find(s=>s.id===currentResults.ranked[0])||{}).name||'--' : '--';
+  document.getElementById('lb-header').innerHTML = `
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">&#x1F3C6; Winner</div><div class="metric-val" style="font-size:16px">${winnerName}</div></div>
+      <div class="metric"><div class="metric-label">Cut-off price</div><div class="metric-val" style="font-size:16px">₹${fmtD(currentResults.cutoffPrice,2)}</div></div>
+      <div class="metric"><div class="metric-label">Market price</div><div class="metric-val" style="font-size:16px;color:var(--success)">₹${fmtD(mp,2)}</div></div>
+    </div>
+    <div class="card" style="background:var(--success-bg);border-color:var(--success-border);margin-bottom:0">
+      <p style="font-size:13px">Wealth updated using market price ₹${fmtD(mp,2)}.
+      ${mp > currentResults.cutoffPrice
+        ? `Stock is trading <strong>above cut-off</strong> — allotted students made a gain of ₹${fmtD(mp - currentResults.cutoffPrice,2)} per share.`
+        : mp < currentResults.cutoffPrice
+        ? `Stock is trading <strong>below cut-off</strong> — allotted students are at a loss of ₹${fmtD(currentResults.cutoffPrice - mp,2)} per share.`
+        : 'Stock is trading at the cut-off price.'
+      }</p>
+    </div>`;
+
+  showItab('itab-leaderboard');
+}
+
+function downloadCSV() {
+  if (!currentResults || !currentStudents) { alert('No results yet. Close the book first.'); return; }
+  const al = currentResults.allotments || {};
+  const bids = currentBids || {};
+  const cfg = currentCfg;
+  const mp = appliedMarketPrice;
+  const cp = currentResults.cutoffPrice;
+  const ts = currentResults.totalShares || 0;
+
+  const rows = [
+    ['IPO Book Building Results'],
+    ['Company', cfg.company],
+    ['Fund raise target', cfg.target],
+    ['Cut-off price', cp],
+    ['Shares issued', ts],
+    ['Market price', mp || 'Not set'],
+    [],
+    ['Student','Bid price','Bid lots','Bid shares','Allotted shares',
+     'Amount paid (at cut-off)','Refund','Unused cash',
+     mp ? 'Market value of shares' : '',
+     'Total wealth','Status','Rank']
+  ];
+
+  currentStudents.forEach(s => {
+    const b = bids[s.id] || {};
+    const a = al[s.id] || {};
+    const status = a.status==='full' ? 'Full allotment'
+      : a.status==='partial' ? 'Partial allotment'
+      : a.status==='below-cutoff' ? 'Below cut-off'
+      : 'No bid';
+    rows.push([
+      s.name,
+      b.price || '',
+      b.lots || '',
+      b.lots ? b.lots * cfg.lot : '',
+      a.allotted || 0,
+      a.cost || 0,
+      a.refund || 0,
+      a.unused != null ? a.unused : cfg.funds,
+      mp ? (a.allotted || 0) * mp : '',
+      a.totalWealth || 0,
+      status,
+      a.rank || ''
+    ]);
+  });
+
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `IPO_Results_${cfg.company}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 </script>
 </body>
 </html>

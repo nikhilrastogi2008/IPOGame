@@ -226,15 +226,12 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
       <div class="section-label">Company details</div>
       <div class="form-row">
         <div class="form-group"><label>Company name</label><input type="text" id="i-company" value="TechCorp Ltd"/></div>
-        <div class="form-group"><label>Total shares on offer</label><input type="number" id="i-shares" value="1000000" min="1"/></div>
+        <div class="form-group"><label>Amount to raise — target (₹)</label><input type="number" id="i-target" value="10000000"/><span class="hint">Shares issued = target ÷ cut-off price</span></div>
       </div>
       <div class="form-row tri">
         <div class="form-group"><label>Price band — floor (₹)</label><input type="number" id="i-floor" value="90" min="1"/></div>
         <div class="form-group"><label>Price band — cap (₹)</label><input type="number" id="i-cap" value="110" min="1"/></div>
         <div class="form-group"><label>Lot size (shares)</label><input type="number" id="i-lot" value="100" min="1"/></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Fund raise target (₹)</label><input type="number" id="i-target" value="100000000"/><span class="hint">Cut-off price = target ÷ shares on offer (minimum price needed)</span></div>
       </div>
     </div>
     <h2>Student settings</h2>
@@ -426,7 +423,7 @@ let unsubListeners=[];
 // ── instructor ────────────────────────────────────────────────────────────────
 function goInstructor(){
   const pwd = prompt('Enter instructor password:');
-  if(pwd !== 'SA2026'){
+  if(pwd !== 'IPO2024'){
     alert('Incorrect password.');
     return;
   }
@@ -443,7 +440,6 @@ async function createRoom(){
   myRoomCode=genCode();
   const config={
     company:document.getElementById('i-company').value||'TechCorp',
-    shares:parseInt(document.getElementById('i-shares').value),
     floor, cap,
     lot:parseInt(document.getElementById('i-lot').value),
     target:parseFloat(document.getElementById('i-target').value),
@@ -516,8 +512,10 @@ async function listenBids(){
     document.getElementById('bid-progress-bar').style.width=pct+'%';
     let totalBidShares=0;
     sArr.filter(s=>bids[s.id]).forEach(s=>{totalBidShares+=(bids[s.id].lots||0)*cfg.lot;});
-    const subX=cfg.shares>0?totalBidShares/cfg.shares:0;
-    document.getElementById('book-label').textContent=`${fmt(totalBidShares)} / ${fmt(cfg.shares)} shares bid`;
+    const estSharesForBar=cfg.target&&cfg.floor?Math.floor(cfg.target/cfg.floor/cfg.lot)*cfg.lot:1;
+    const subX=totalBidShares/estSharesForBar;
+    const estShares=cfg.target&&cfg.floor?Math.floor(cfg.target/cfg.floor/cfg.lot)*cfg.lot:0;
+    document.getElementById('book-label').textContent=`${fmt(totalBidShares)} shares bid (est. ${fmt(estShares)} shares at floor)`;
     document.getElementById('book-pct').textContent=`${fmtD(subX,2)}x subscribed`;
     const bar=document.getElementById('book-bar');
     bar.style.width=Math.min(subX*100,100)+'%';
@@ -553,39 +551,57 @@ async function closeBookCalc(cfg, students, bids){
 
   // ── Book building cut-off logic ──────────────────────────────────────────
   // ── Correct book building allotment logic ──────────────────────────────
-  // 1. Sort bids highest to lowest
-  // 2. Fill from top: highest bidder gets full allotment first, then next, etc.
-  // 3. Last bid to receive any allotment defines the cut-off price
-  // 4. Everyone pays the cut-off price, not their own bid price
+  // Company wants to RAISE a target amount — shares issued = target ÷ cut-off price
+  // 1. Sort bids highest to lowest price
+  // 2. Cut-off = lowest price at which total demand (in ₹) >= target
+  // 3. Shares issued = target ÷ cut-off price
+  // 4. Fill allotments from highest bid down until shares are exhausted
+  // 5. Everyone pays the cut-off price
 
   const sortedBids=students
     .filter(s=>bids[s.id]&&bids[s.id].lots>0)
     .map(s=>({student:s,bid:bids[s.id]}))
     .sort((a,b)=>b.bid.price-a.bid.price);
 
-  let sharesRemaining=cfg.shares;
+  // Step 1: Find cut-off price
+  // Accumulate bids high to low. Cut-off = price where cumulative ₹ demand >= target
+  let cumAmount=0;
   let cutoffPrice=cfg.floor;
-  const allottedMap={};
+  for(let i=0;i<sortedBids.length;i++){
+    const b=sortedBids[i].bid;
+    cumAmount+=b.lots*cfg.lot*b.price;
+    if(cumAmount>=cfg.target){
+      cutoffPrice=b.price;
+      break;
+    }
+    // If all bids exhausted without meeting target, use lowest bid price as cut-off
+    if(i===sortedBids.length-1) cutoffPrice=b.price;
+  }
 
+  // Step 2: Shares to be issued = target ÷ cut-off price (rounded to lot size)
+  const totalShares=Math.floor(cfg.target/cutoffPrice/cfg.lot)*cfg.lot;
+
+  // Step 3: Allot shares from highest bid down
+  let sharesRemaining=totalShares;
+  const allottedMap={};
   for(let i=0;i<sortedBids.length;i++){
     const {student:s,bid:b}=sortedBids[i];
+    if(b.price<cutoffPrice){ allottedMap[s.id]=0; continue; }
     const wanted=b.lots*cfg.lot;
     if(sharesRemaining<=0){
       allottedMap[s.id]=0;
     } else if(wanted<=sharesRemaining){
       allottedMap[s.id]=wanted;
       sharesRemaining-=wanted;
-      cutoffPrice=b.price;
     } else {
       const partial=Math.floor(sharesRemaining/cfg.lot)*cfg.lot;
       allottedMap[s.id]=partial;
-      sharesRemaining-=partial;
-      cutoffPrice=b.price;
+      sharesRemaining=0;
     }
   }
   students.forEach(s=>{if(allottedMap[s.id]===undefined)allottedMap[s.id]=0;});
   const eligibleShares=Object.values(allottedMap).reduce((a,v)=>a+v,0);
-  const ratio=cfg.shares>0?eligibleShares/cfg.shares:0;
+  const ratio=totalShares>0?eligibleShares/totalShares:0;
 
   const allotments={};
   students.forEach(s=>{
@@ -616,7 +632,7 @@ async function closeBookCalc(cfg, students, bids){
 
   // Don't duplicate students/bids in results — they're already in Firebase
   // Only store the computed allotment data
-  const results={cutoffPrice,eligibleShares,ratio,allotments,
+  const results={cutoffPrice,eligibleShares,totalShares,ratio,allotments,
     ranked:ranked.map(s=>s.id)};
 
   // Write results
@@ -668,17 +684,19 @@ function showFinalResults(cfg,results,students,bids){
   document.getElementById('results-final').style.display='block';
   const {allotments,ranked,cutoffPrice,eligibleShares,ratio}=results;
   const cp=cutoffPrice;
-  const subX=eligibleShares/cfg.shares;
+  const subX=results.totalShares>0?eligibleShares/results.totalShares:0;
 
+  const totalShares=results.totalShares||0;
+  const fundsRaised=totalShares*cp;
   document.getElementById('final-summary').innerHTML=`
     <div class="metrics" style="margin-bottom:1rem">
       <div class="metric"><div class="metric-label">Cut-off price</div><div class="metric-val">₹${fmtD(cp,2)}</div><div class="metric-sub">Everyone pays this price</div></div>
-      <div class="metric"><div class="metric-label">Funds raised</div><div class="metric-val">₹${fmt(cp*cfg.shares)}</div><div class="metric-sub">Target ₹${fmt(cfg.target)}</div></div>
-      <div class="metric"><div class="metric-label">Subscription</div><div class="metric-val">${fmtD(subX,2)}x</div><div class="metric-sub">${fmt(eligibleShares)} eligible shares</div></div>
+      <div class="metric"><div class="metric-label">Shares issued</div><div class="metric-val">${fmt(totalShares)}</div><div class="metric-sub">Target ÷ Cut-off price</div></div>
+      <div class="metric"><div class="metric-label">Funds raised</div><div class="metric-val">₹${fmt(fundsRaised)}</div><div class="metric-sub">Target ₹${fmt(cfg.target)}</div></div>
     </div>
     <div class="result-box ${subX>=1?'good':'warn'}" style="margin-bottom:1rem">
-      <h3>${subX>=1?`Oversubscribed ${fmtD(subX,2)}x — pro-rata allotment at ₹${fmtD(cp,2)}`:`Undersubscribed — full allotment at cut-off ₹${fmtD(cp,2)}`}</h3>
-      <p style="font-size:13px">${subX>=1?`${fmtD(ratio*100,1)}% of bid shares allotted to each eligible student. Everyone pays ₹${fmtD(cp,2)} — excess refunded.`:`All eligible bidders receive full allotment. Everyone pays ₹${fmtD(cp,2)}.`}</p>
+      <h3>${subX>=1?`Oversubscribed — pro-rata allotment at cut-off ₹${fmtD(cp,2)}`:`Fully subscribed at cut-off ₹${fmtD(cp,2)}`}</h3>
+      <p style="font-size:13px">Company issues ${fmt(totalShares)} shares at ₹${fmtD(cp,2)} each, raising ₹${fmt(fundsRaised)}. Everyone who bid at or above cut-off pays ₹${fmtD(cp,2)} — excess refunded.</p>
     </div>`;
 
   let rows='';
@@ -782,17 +800,42 @@ async function listenStudentPhase(){
     if(!cfg) return;
     sConfig=cfg;
     if(cfg.phase==='results'){
-      Promise.all([
-        dbGet(`rooms/${myRoomCode}/results`),
-        dbGet(`rooms/${myRoomCode}/students`),
-        dbGet(`rooms/${myRoomCode}/bids`)
-      ]).then(([results,sObj,bObj])=>{
-        if(!results) return;
-        const al=(results.allotments||{})[myStudentId];
-        const b=bObj?bObj[myStudentId]:null;
-        const students=sObj?Object.values(sObj):[];
-        if(al) showStudentResult(cfg,results,al,b,students,bObj||{});
-      });
+      // Hide waiting/submitted screens immediately
+      document.getElementById('student-waiting').style.display='none';
+      document.getElementById('student-submitted').style.display='none';
+      // Show loading message while fetching results
+      document.getElementById('student-waiting').style.display='block';
+      document.getElementById('student-waiting').querySelector('h2').textContent='Results are ready! Loading…';
+
+      function fetchAndShowResults(retries){
+        Promise.all([
+          dbGet(`rooms/${myRoomCode}/results`),
+          dbGet(`rooms/${myRoomCode}/students`),
+          dbGet(`rooms/${myRoomCode}/bids`)
+        ]).then(([results,sObj,bObj])=>{
+          if(!results){
+            // Results not written yet — retry up to 5 times
+            if(retries>0) setTimeout(()=>fetchAndShowResults(retries-1), 1500);
+            return;
+          }
+          const al=(results.allotments||{})[myStudentId];
+          const b=bObj?bObj[myStudentId]:null;
+          const students=sObj?Object.values(sObj):[];
+          const bids=bObj||{};
+          document.getElementById('student-waiting').style.display='none';
+          if(al) showStudentResult(cfg,results,al,b,students,bids);
+          else {
+            const dummyAl={allotted:0,cost:0,refund:0,unused:cfg.funds,
+              interest:cfg.funds*(cfg.rate/100)*(cfg.period/12),
+              status:'no-bid',rank:students.length,
+              totalWealth:cfg.funds+cfg.funds*(cfg.rate/100)*(cfg.period/12)};
+            showStudentResult(cfg,results,dummyAl,null,students,bids);
+          }
+        }).catch(e=>{
+          if(retries>0) setTimeout(()=>fetchAndShowResults(retries-1), 2000);
+        });
+      }
+      fetchAndShowResults(5);
       return;
     }
     if(cfg.phase==='bidding'){
@@ -820,7 +863,7 @@ function showBiddingUI(cfg){
   const pe=document.getElementById('s-price');
   if(!pe.dataset.init){pe.min=cfg.floor;pe.max=cfg.cap;pe.value=cfg.floor;pe.dataset.init='1';}
   document.getElementById('s-price-hint').textContent=`Enter between ₹${fmt(cfg.floor)} and ₹${fmt(cfg.cap)}`;
-  document.getElementById('s-lots-hint').textContent=`1 lot = ${fmt(cfg.lot)} shares · Max ${Math.floor(cfg.funds/(cfg.lot*cfg.floor))} lots at floor price`;
+  document.getElementById('s-lots-hint').textContent=`1 lot = ${fmt(cfg.lot)} shares · Max ${Math.floor(cfg.funds/(cfg.lot*cfg.floor))} lots at floor price (budget limit)`;
   updateBidCalc();
 }
 

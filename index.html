@@ -4,25 +4,29 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>IPO Book Building Game</title>
-<!-- Firebase loaded as regular scripts, not modules, to avoid async timing issues -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    databaseURL: "https://ipo-game-default-rtdb.asia-southeast1.firebasedatabase.app"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const _db = firebase.database();
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, set, get, update, remove, onValue, off } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  function dbSet(path, value)    { return _db.ref(path).set(value); }
-  function dbGet(path)           { return _db.ref(path).once('value').then(s => s.val()); }
-  function dbUpdate(path, value) { return _db.ref(path).update(value); }
-  function dbRemove(path)        { return _db.ref(path).remove(); }
-  function dbOn(path, cb) {
-    const r = _db.ref(path);
-    r.on('value', snap => cb(snap.val()));
-    return () => r.off('value');
-  }
+const app = initializeApp({ databaseURL: "https://ipo-game-default-rtdb.asia-southeast1.firebasedatabase.app" });
+const _db = getDatabase(app);
+
+window.dbSet    = (path, val) => set(ref(_db, path), val);
+window.dbGet    = (path) => get(ref(_db, path)).then(s => s.val());
+window.dbUpdate = (path, val) => update(ref(_db, path), val);
+window.dbRemove = (path) => remove(ref(_db, path));
+window.dbOn     = (path, cb) => {
+  const r = ref(_db, path);
+  onValue(r, snap => cb(snap.val()));
+  return () => off(r);
+};
+
+// Disable all buttons until Firebase is ready, then enable them
+document.querySelectorAll('.landing-card').forEach(el => el.style.pointerEvents='none');
+window.addEventListener('load', () => {
+  document.querySelectorAll('.landing-card').forEach(el => el.style.pointerEvents='');
+  document.getElementById('firebase-status').style.display='none';
+});
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap');
@@ -168,6 +172,9 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
 
 <!-- LANDING -->
 <div class="screen active" id="screen-landing">
+  <div id="firebase-status" style="text-align:center;padding:8px;background:#FEF3C7;font-size:13px;border-radius:8px;margin-bottom:1rem">
+    ⏳ Connecting to database…
+  </div>
   <div class="landing-hero">
     <h1>IPO Book Building Simulation</h1>
     <p>Learn how companies discover the right price and allocate shares through live bidding</p>
@@ -394,7 +401,16 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
 
 </div>
 <script>
-// DB helpers defined above in compat script block
+// DB helpers are on window.* set by the Firebase module above
+// Wait for Firebase module to assign window.dbGet before proceeding
+function waitForDB() {
+  return new Promise(resolve => {
+    if (window.dbGet) { resolve(); return; }
+    const interval = setInterval(() => {
+      if (window.dbGet) { clearInterval(interval); resolve(); }
+    }, 50);
+  });
+}
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 function fmt(n){return Math.round(n).toLocaleString('en-IN');}
@@ -433,19 +449,24 @@ function goInstructor(){
 }
 
 async function createRoom(){
+  await waitForDB();
+  try {
   const floor=parseFloat(document.getElementById('i-floor').value);
   const cap=parseFloat(document.getElementById('i-cap').value);
+  if(!floor||!cap){alert('Please enter floor and cap prices.');return;}
   if(floor>=cap){alert('Floor must be less than cap.');return;}
+  const target=parseFloat(document.getElementById('i-target').value);
+  if(!target||target<=0){alert('Please enter a valid fundraise target.');return;}
   setLoading('btn-create',true,'Creating room…');
   myRoomCode=genCode();
   const config={
     company:document.getElementById('i-company').value||'TechCorp',
     floor, cap,
-    lot:parseInt(document.getElementById('i-lot').value),
-    target:parseFloat(document.getElementById('i-target').value),
-    funds:parseFloat(document.getElementById('i-funds').value),
-    rate:parseFloat(document.getElementById('i-rate').value),
-    period:parseInt(document.getElementById('i-period').value),
+    lot:parseInt(document.getElementById('i-lot').value)||100,
+    target,
+    funds:parseFloat(document.getElementById('i-funds').value)||500000,
+    rate:parseFloat(document.getElementById('i-rate').value)||6,
+    period:parseInt(document.getElementById('i-period').value)||12,
     phase:'lobby', code:myRoomCode, createdAt:Date.now()
   };
   await dbSet(`rooms/${myRoomCode}/config`, config);
@@ -457,9 +478,14 @@ async function createRoom(){
   document.getElementById('hpill-room').style.display='';
   showItab('itab-lobby');
   listenLobby();
+  } catch(e) {
+    alert('Error creating room: ' + e.message);
+    setLoading('btn-create',false,'Create room & get code →');
+  }
 }
 
 async function listenLobby(){
+  await waitForDB();
   const unsub = dbOn(`rooms/${myRoomCode}/students`, students => {
     const list = students ? Object.values(students) : [];
     document.getElementById('lob-count').textContent=list.length;
@@ -473,6 +499,7 @@ async function listenLobby(){
 }
 
 async function openBidding(){
+  await waitForDB();
   await dbUpdate(`rooms/${myRoomCode}/config`, {phase:'bidding'});
   document.getElementById('btn-open-bids').disabled=true;
   document.getElementById('btn-open-bids').textContent='Bidding open ✓';
@@ -483,6 +510,7 @@ async function openBidding(){
 }
 
 async function listenBids(){
+  await waitForDB();
   // Listen to students and bids in real time
   let students={}, bids={}, cfg=null;
 
@@ -766,6 +794,7 @@ async function endGame(){
 
 // ── student ───────────────────────────────────────────────────────────────────
 async function joinGame(){
+  await waitForDB();
   const name=document.getElementById('join-name').value.trim();
   const code=document.getElementById('join-code').value.trim().toUpperCase();
   const err=document.getElementById('join-error'); err.style.display='none';
@@ -795,6 +824,7 @@ async function joinGame(){
 }
 
 async function listenStudentPhase(){
+  await waitForDB();
   // Real-time listener — updates instantly when instructor changes phase
   const unsub=dbOn(`rooms/${myRoomCode}/config`, cfg=>{
     if(!cfg) return;

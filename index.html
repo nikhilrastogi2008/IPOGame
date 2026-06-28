@@ -4,29 +4,146 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>IPO Book Building Game</title>
-
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#111827;--ink2:#374151;--muted:#6B7280;--faint:#9CA3AF;--border:#E5E7EB;--border2:#D1D5DB;--surface:#F9FAFB;--white:#fff;--accent:#2563EB;--accent-bg:#EFF6FF;--accent-border:#BFDBFE;--success:#059669;--success-bg:#ECFDF5;--success-border:#A7F3D0;--warn:#D97706;--warn-bg:#FFFBEB;--warn-border:#FDE68A;--danger:#DC2626;--danger-bg:#FEF2F2;--danger-border:#FECACA;--radius:10px;--radius-sm:6px;--mono:'JetBrains Mono',monospace}
+html{font-size:15px}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;line-height:1.6}
+.screen{display:none}
+.screen.active{display:block}
+.itab{display:none}
+.itab.active{display:block}
+.app-header{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;gap:12px;height:56px;position:sticky;top:0;z-index:100}
+.logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.logo-icon{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+.hpill{font-size:12px;font-weight:500;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:3px 10px}
+.hpill.ml{margin-left:auto}
+.page{max-width:820px;margin:0 auto;padding:2rem 1.5rem}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:1rem}
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px;font-weight:500}
+input[type=text],input[type=number]{width:100%;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;color:var(--ink);background:var(--white);outline:none;transition:border-color .15s}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.form-row.tri{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column}
+.hint{font-size:11px;color:var(--faint);margin-top:4px}
+.error-msg{font-size:12px;color:var(--danger);margin-top:6px;display:none}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--white);color:var(--ink);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:background .12s}
+.btn:hover{background:var(--surface)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary:hover{background:#1D4ED8}
+.btn.danger-btn{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border)}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.25rem}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.5rem;gap:2px}
+.tab{padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;margin-bottom:-1px}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
+.metric{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.1rem}
+.metric-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin-bottom:4px}
+.metric-val{font-size:20px;font-weight:600;color:var(--ink)}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.b-success{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
+.b-warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
+.b-danger{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
+.b-muted{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+.b-accent{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+.progress-outer{background:var(--surface);border-radius:4px;height:7px;overflow:hidden;margin-top:6px}
+.progress-inner{height:100%;border-radius:4px;background:var(--accent);transition:width .4s}
+.progress-inner.over{background:var(--danger)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:620px}
+th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--border);color:var(--ink2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface)}
+.room-code{font-family:var(--mono);font-size:52px;font-weight:500;color:var(--accent);letter-spacing:.15em;text-align:center;padding:1.5rem 0 .5rem}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accent-bg);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;border:1px solid var(--accent-border)}
+.student-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.student-row:last-child{border-bottom:none}
+.result-box{border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1rem}
+.result-box.good{background:var(--success-bg);border:1px solid var(--success-border)}
+.result-box.warn{background:var(--warn-bg);border:1px solid var(--warn-border)}
+.result-box.bad{background:var(--danger-bg);border:1px solid var(--danger-border)}
+.result-box h3{margin-bottom:4px}
+.result-box.good h3{color:var(--success)}
+.result-box.warn h3{color:var(--warn)}
+.result-box.bad h3{color:var(--danger)}
+.big-status{text-align:center;padding:3rem 1rem}
+.big-icon{font-size:48px;margin-bottom:1rem}
+.section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px}
+.bid-calc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.875rem 1rem;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.bid-calc-item label{font-size:11px;color:var(--faint);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.bid-calc-item .val{font-size:16px;font-weight:600;color:var(--ink);margin-top:2px}
+.landing-hero{text-align:center;padding:3rem 1rem 2rem}
+.landing-hero h1{font-size:28px;font-weight:600;margin-bottom:8px}
+.landing-hero p{color:var(--muted);font-size:15px;margin-bottom:2rem}
+.landing-cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem}
+.landing-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;cursor:pointer;transition:border-color .15s,box-shadow .15s;text-align:left}
+.landing-card:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.landing-card-icon{font-size:28px;margin-bottom:12px}
+.landing-card h2{font-size:15px;font-weight:600;margin-bottom:4px}
+.landing-card p{font-size:13px;color:var(--muted)}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+.spinner.dark{border-color:var(--border2);border-top-color:var(--accent)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.pulse{animation:pulse 1.8s infinite}
+h1{font-size:22px;font-weight:600;margin-bottom:6px}
+h2{font-size:17px;font-weight:600;margin-bottom:12px}
+h3{font-size:14px;font-weight:600;margin-bottom:8px}
+.leaderboard{margin-bottom:1rem}
+.lb-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--radius);margin-bottom:8px;border:1px solid var(--border);background:var(--white)}
+.lb-row.rank-1{background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border-color:#FDE68A}
+.lb-row.rank-2{background:linear-gradient(135deg,#F8FAFC,#F1F5F9);border-color:#CBD5E1}
+.lb-row.rank-3{background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA}
+.lb-rank{font-size:22px;width:36px;text-align:center;flex-shrink:0}
+.lb-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.lb-row.rank-1 .lb-avatar{background:#FDE68A;color:#92400E;border:2px solid #F59E0B}
+.lb-row.rank-2 .lb-avatar{background:#E2E8F0;color:#475569;border:2px solid #94A3B8}
+.lb-row.rank-3 .lb-avatar{background:#FED7AA;color:#9A3412;border:2px solid #F97316}
+.lb-avatar-default{background:var(--accent-bg);color:var(--accent);border:2px solid var(--accent-border)}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:14px;font-weight:600;color:var(--ink)}
+.lb-detail{font-size:12px;color:var(--muted);margin-top:1px}
+.lb-bars{display:flex;gap:4px;margin-top:6px;align-items:center}
+.lb-bar-seg{height:6px;border-radius:3px;min-width:3px}
+.lb-bar-seg.allotment{background:var(--accent)}
+.lb-bar-seg.unused{background:#93C5FD}
+.lb-bar-seg.interest{background:var(--success)}
+.lb-wealth{text-align:right;flex-shrink:0}
+.lb-wealth-val{font-size:18px;font-weight:600;color:var(--ink)}
+.lb-wealth-label{font-size:11px;color:var(--muted)}
+.lb-legend{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap}
+.lb-legend span{display:flex;align-items:center;gap:4px}
+.lb-legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.lb-student-pos{font-size:64px;font-weight:600;text-align:center;line-height:1}
+.lb-student-subtitle{font-size:14px;color:var(--muted);text-align:center;margin-top:4px;margin-bottom:1.5rem}
+@media(max-width:600px){.form-row,.form-row.tri{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.landing-cards{grid-template-columns:1fr}.bid-calc{grid-template-columns:1fr 1fr}.room-code{font-size:36px}.page{padding:1.25rem 1rem}.lb-bars{display:none}}
+</style>
 </head>
 <body>
-
 <header class="app-header">
-  <div class="logo"><div class="logo-icon">📈</div>IPO Book Building</div>
+  <div class="logo"><div class="logo-icon">&#x1F4C8;</div>IPO Book Building</div>
   <span class="hpill" id="hpill-room" style="display:none"></span>
   <span class="hpill ml" id="hpill-role">Simulation</span>
 </header>
 <div class="page">
-<!-- LANDING -->
-<div class="screen active" class="screen active" id="screen-landing">
+
+<div class="screen active" id="screen-landing">
   <div class="landing-hero">
     <h1>IPO Book Building Simulation</h1>
     <p>Learn how companies discover the right price and allocate shares through live bidding</p>
   </div>
   <div class="landing-cards">
     <div class="landing-card" onclick="goInstructor()">
-      <div class="landing-card-icon">🎓</div><h2>Instructor</h2>
+      <div class="landing-card-icon">&#x1F393;</div><h2>Instructor</h2>
       <p>Set up an IPO, share the room code, and reveal results to the class</p>
     </div>
     <div class="landing-card" onclick="showScreen('screen-join')">
-      <div class="landing-card-icon">🙋</div><h2>Student</h2>
+      <div class="landing-card-icon">&#x1F64B;</div><h2>Student</h2>
       <p>Join your class game with a room code and place your bid privately</p>
     </div>
   </div>
@@ -35,8 +152,8 @@
     <p style="font-size:13px">Each student gets a notional fund and bids privately. The cut-off price is where the company raises its full target. Everyone pays the cut-off price. A <strong>wealth leaderboard</strong> reveals the best strategy.</p>
   </div>
 </div>
-<!-- JOIN -->
-<div class="screen" class="screen" id="screen-join">
+
+<div class="screen" id="screen-join">
   <h1 style="margin-bottom:4px">Join a game</h1>
   <p style="color:var(--muted);font-size:14px;margin-bottom:1.5rem">Enter your name and the room code your instructor shared</p>
   <div class="card">
@@ -53,13 +170,13 @@
     </div>
   </div>
 </div>
-<!-- INSTRUCTOR -->
-<div class="screen" class="screen" id="screen-instructor">
+
+<div class="screen" id="screen-instructor">
   <div class="tabs">
     <button class="tab active" onclick="showItab('itab-setup')">Setup</button>
     <button class="tab" onclick="showItab('itab-lobby')">Lobby</button>
     <button class="tab" onclick="showItab('itab-results')">Results</button>
-    <button class="tab" onclick="showItab('itab-leaderboard')">🏆 Leaderboard</button>
+    <button class="tab" onclick="showItab('itab-leaderboard')">&#x1F3C6; Leaderboard</button>
   </div>
   <div class="itab active" id="itab-setup">
     <h2>IPO configuration</h2>
@@ -89,7 +206,7 @@
     <div style="text-align:center;margin-bottom:1.5rem">
       <p style="font-size:13px;color:var(--muted);margin-bottom:4px">Share this code with your students</p>
       <div class="room-code" id="display-code">--</div>
-      <p style="font-size:12px;color:var(--faint)">Students open the HTML file &rarr; Student &rarr; Join a game</p>
+      <p style="font-size:12px;color:var(--faint)">Students open the file and click Student &rarr; Join a game</p>
     </div>
     <div class="metrics">
       <div class="metric"><div class="metric-label">Company</div><div class="metric-val" id="lob-company" style="font-size:15px">--</div></div>
@@ -97,12 +214,10 @@
       <div class="metric"><div class="metric-label">Students joined</div><div class="metric-val" id="lob-count">0</div></div>
     </div>
     <div class="card"><h3 style="margin-bottom:12px">Students in lobby</h3><div id="lobby-list"><p style="font-size:13px;color:var(--faint)">Waiting for students...</p></div></div>
-    <div class="btn-row">
-      <button class="btn primary" id="btn-open-bids" onclick="openBidding()" disabled>Open bidding &rarr;</button>
-    </div>
+    <div class="btn-row"><button class="btn primary" id="btn-open-bids" onclick="openBidding()" disabled>Open bidding &rarr;</button><button class="btn" onclick="pollBids()">&#8635; Refresh</button></div>
   </div>
   <div class="itab" id="itab-results">
-    <div id="results-waiting" class="big-status"><div class="big-icon">📋</div><p style="color:var(--muted)">Open bidding first from the Lobby tab</p></div>
+    <div id="results-waiting" class="big-status"><div class="big-icon">&#x1F4CB;</div><p style="color:var(--muted)">Open bidding first from the Lobby tab</p></div>
     <div id="results-live" style="display:none">
       <div class="card">
         <div class="section-label">Bid submissions</div>
@@ -123,13 +238,13 @@
     <div id="results-final" style="display:none">
       <div id="final-summary"></div><div id="final-table"></div>
       <div class="btn-row">
-        <button class="btn primary" onclick="showItab('itab-leaderboard')">🏆 View leaderboard &rarr;</button>
+        <button class="btn primary" onclick="showItab('itab-leaderboard')">&#x1F3C6; View leaderboard &rarr;</button>
         <button class="btn danger-btn" onclick="endGame()">End game</button>
       </div>
     </div>
   </div>
   <div class="itab" id="itab-leaderboard">
-    <div id="leaderboard-waiting" class="big-status"><div class="big-icon">🏆</div><p style="color:var(--muted)">Leaderboard appears after you close the book</p></div>
+    <div id="leaderboard-waiting" class="big-status"><div class="big-icon">&#x1F3C6;</div><p style="color:var(--muted)">Leaderboard appears after you close the book</p></div>
     <div id="leaderboard-content" style="display:none">
       <div id="lb-header" style="margin-bottom:1rem"></div>
       <div class="lb-legend">
@@ -146,10 +261,10 @@
     </div>
   </div>
 </div>
-<!-- STUDENT -->
-<div class="screen" class="screen" id="screen-student">
+
+<div class="screen" id="screen-student">
   <div id="student-waiting" class="big-status">
-    <div class="big-icon pulse">⏳</div>
+    <div class="big-icon pulse">&#x23F3;</div>
     <h2>Waiting for instructor to open bidding...</h2>
     <p style="color:var(--muted);font-size:13px;margin-top:6px" id="student-name-display"></p>
   </div>
@@ -179,7 +294,7 @@
     </div>
   </div>
   <div id="student-submitted" style="display:none" class="big-status">
-    <div class="big-icon">✅</div><h2>Bid submitted!</h2>
+    <div class="big-icon">&#x2705;</div><h2>Bid submitted!</h2>
     <div class="card" style="text-align:left;max-width:360px;margin:1rem auto 0"><div id="submitted-summary" style="font-size:13px;color:var(--ink2)"></div></div>
     <p style="color:var(--faint);font-size:13px;margin-top:1rem" class="pulse">Waiting for instructor to close the book...</p>
   </div>
@@ -187,7 +302,7 @@
     <h1 style="margin-bottom:1.5rem">Your result</h1>
     <div id="student-result-content"></div>
     <div id="student-leaderboard-section" style="display:none;margin-top:1.5rem">
-      <h2 style="margin-bottom:.5rem">🏆 Class leaderboard</h2>
+      <h2 style="margin-bottom:.5rem">&#x1F3C6; Class leaderboard</h2>
       <div class="lb-legend" style="margin-bottom:10px">
         <span><div class="lb-legend-dot" style="background:var(--accent)"></div>Allotment</span>
         <span><div class="lb-legend-dot" style="background:#93C5FD"></div>Unused funds</span>
@@ -197,8 +312,8 @@
     </div>
   </div>
 </div>
-</div>
 
+</div>
 <script>
 // --- Firebase REST API (no SDK) ---
 const DB = 'https://ipo-game-default-rtdb.asia-southeast1.firebasedatabase.app';

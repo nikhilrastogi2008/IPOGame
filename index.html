@@ -4,8 +4,202 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>IPO Book Building Game</title>
-<script>
 
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo"><div class="logo-icon">📈</div>IPO Book Building</div>
+  <span class="hpill" id="hpill-room" style="display:none"></span>
+  <span class="hpill ml" id="hpill-role">Simulation</span>
+</header>
+<div class="page">
+<!-- LANDING -->
+<div class="screen active" class="screen active" id="screen-landing">
+  <div class="landing-hero">
+    <h1>IPO Book Building Simulation</h1>
+    <p>Learn how companies discover the right price and allocate shares through live bidding</p>
+  </div>
+  <div class="landing-cards">
+    <div class="landing-card" onclick="goInstructor()">
+      <div class="landing-card-icon">🎓</div><h2>Instructor</h2>
+      <p>Set up an IPO, share the room code, and reveal results to the class</p>
+    </div>
+    <div class="landing-card" onclick="showScreen('screen-join')">
+      <div class="landing-card-icon">🙋</div><h2>Student</h2>
+      <p>Join your class game with a room code and place your bid privately</p>
+    </div>
+  </div>
+  <div class="card" style="background:var(--accent-bg);border-color:var(--accent-border)">
+    <h3 style="color:var(--accent);margin-bottom:6px">How it works</h3>
+    <p style="font-size:13px">Each student gets a notional fund and bids privately. The cut-off price is where the company raises its full target. Everyone pays the cut-off price. A <strong>wealth leaderboard</strong> reveals the best strategy.</p>
+  </div>
+</div>
+<!-- JOIN -->
+<div class="screen" class="screen" id="screen-join">
+  <h1 style="margin-bottom:4px">Join a game</h1>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:1.5rem">Enter your name and the room code your instructor shared</p>
+  <div class="card">
+    <div class="form-row">
+      <div class="form-group"><label>Your name</label><input type="text" id="join-name" placeholder="e.g. Arjun Sharma"/></div>
+      <div class="form-group"><label>Room code</label>
+        <input type="text" id="join-code" placeholder="e.g. AB12" maxlength="4" style="text-transform:uppercase;font-family:var(--mono);font-size:20px;letter-spacing:.12em" oninput="this.value=this.value.toUpperCase()"/>
+      </div>
+    </div>
+    <div class="error-msg" id="join-error">Room not found. Check the code with your instructor.</div>
+    <div class="btn-row" style="margin-top:.75rem">
+      <button class="btn primary" id="btn-join" onclick="joinGame()">Join game &rarr;</button>
+      <button class="btn" onclick="showScreen('screen-landing')">Back</button>
+    </div>
+  </div>
+</div>
+<!-- INSTRUCTOR -->
+<div class="screen" class="screen" id="screen-instructor">
+  <div class="tabs">
+    <button class="tab active" onclick="showItab('itab-setup')">Setup</button>
+    <button class="tab" onclick="showItab('itab-lobby')">Lobby</button>
+    <button class="tab" onclick="showItab('itab-results')">Results</button>
+    <button class="tab" onclick="showItab('itab-leaderboard')">🏆 Leaderboard</button>
+  </div>
+  <div class="itab active" id="itab-setup">
+    <h2>IPO configuration</h2>
+    <div class="card">
+      <div class="section-label">Company details</div>
+      <div class="form-row">
+        <div class="form-group"><label>Company name</label><input type="text" id="i-company" value="TechCorp Ltd"/></div>
+        <div class="form-group"><label>Amount to raise (&#8377;)</label><input type="number" id="i-target" value="10000000"/><span class="hint">Shares issued = target &divide; cut-off price</span></div>
+      </div>
+      <div class="form-row tri">
+        <div class="form-group"><label>Price band floor (&#8377;)</label><input type="number" id="i-floor" value="90" min="1"/></div>
+        <div class="form-group"><label>Price band cap (&#8377;)</label><input type="number" id="i-cap" value="110" min="1"/></div>
+        <div class="form-group"><label>Lot size (shares)</label><input type="number" id="i-lot" value="100" min="1"/></div>
+      </div>
+    </div>
+    <h2>Student settings</h2>
+    <div class="card">
+      <div class="form-row tri">
+        <div class="form-group"><label>Notional funds per student (&#8377;)</label><input type="number" id="i-funds" value="500000"/></div>
+        <div class="form-group"><label>Interest rate (%)</label><input type="number" id="i-rate" value="6" step="0.1"/></div>
+        <div class="form-group"><label>Investment period (months)</label><input type="number" id="i-period" value="12"/></div>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn primary" id="btn-create" onclick="createRoom()">Create room &amp; get code &rarr;</button></div>
+  </div>
+  <div class="itab" id="itab-lobby">
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:4px">Share this code with your students</p>
+      <div class="room-code" id="display-code">--</div>
+      <p style="font-size:12px;color:var(--faint)">Students open the HTML file &rarr; Student &rarr; Join a game</p>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Company</div><div class="metric-val" id="lob-company" style="font-size:15px">--</div></div>
+      <div class="metric"><div class="metric-label">Price band</div><div class="metric-val" id="lob-band" style="font-size:15px">--</div></div>
+      <div class="metric"><div class="metric-label">Students joined</div><div class="metric-val" id="lob-count">0</div></div>
+    </div>
+    <div class="card"><h3 style="margin-bottom:12px">Students in lobby</h3><div id="lobby-list"><p style="font-size:13px;color:var(--faint)">Waiting for students...</p></div></div>
+    <div class="btn-row">
+      <button class="btn primary" id="btn-open-bids" onclick="openBidding()" disabled>Open bidding &rarr;</button>
+    </div>
+  </div>
+  <div class="itab" id="itab-results">
+    <div id="results-waiting" class="big-status"><div class="big-icon">📋</div><p style="color:var(--muted)">Open bidding first from the Lobby tab</p></div>
+    <div id="results-live" style="display:none">
+      <div class="card">
+        <div class="section-label">Bid submissions</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span id="bid-progress-label" style="color:var(--muted)">0 / 0 submitted</span><span id="bid-progress-pct" style="font-weight:600">0%</span></div>
+        <div class="progress-outer"><div class="progress-inner" id="bid-progress-bar" style="width:0%"></div></div>
+      </div>
+      <div class="card">
+        <div class="section-label">Order book</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span id="book-label" style="color:var(--muted)">0 shares bid</span><span id="book-pct" style="font-weight:600">--</span></div>
+        <div class="progress-outer"><div class="progress-inner" id="book-bar" style="width:0%"></div></div>
+      </div>
+      <div class="card"><h3 style="margin-bottom:12px">Student bid status</h3><div id="bid-status-rows"></div></div>
+      <div class="btn-row">
+        <button class="btn primary" id="btn-close-book" onclick="closeBook()" disabled>Close book &amp; reveal results &rarr;</button>
+        <button class="btn" onclick="pollBids()">&#8635; Refresh</button>
+      </div>
+    </div>
+    <div id="results-final" style="display:none">
+      <div id="final-summary"></div><div id="final-table"></div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="showItab('itab-leaderboard')">🏆 View leaderboard &rarr;</button>
+        <button class="btn danger-btn" onclick="endGame()">End game</button>
+      </div>
+    </div>
+  </div>
+  <div class="itab" id="itab-leaderboard">
+    <div id="leaderboard-waiting" class="big-status"><div class="big-icon">🏆</div><p style="color:var(--muted)">Leaderboard appears after you close the book</p></div>
+    <div id="leaderboard-content" style="display:none">
+      <div id="lb-header" style="margin-bottom:1rem"></div>
+      <div class="lb-legend">
+        <span><div class="lb-legend-dot" style="background:var(--accent)"></div>Shares allotted</span>
+        <span><div class="lb-legend-dot" style="background:#93C5FD"></div>Unused funds</span>
+        <span><div class="lb-legend-dot" style="background:var(--success)"></div>Interest earned</span>
+      </div>
+      <div class="leaderboard" id="lb-rows"></div>
+      <div class="card" style="background:var(--accent-bg);border-color:var(--accent-border)">
+        <h3 style="color:var(--accent);margin-bottom:8px">Strategy debrief</h3>
+        <div id="lb-debrief" style="font-size:13px;color:var(--ink2)"></div>
+      </div>
+      <div class="btn-row"><button class="btn danger-btn" onclick="endGame()">End game</button></div>
+    </div>
+  </div>
+</div>
+<!-- STUDENT -->
+<div class="screen" class="screen" id="screen-student">
+  <div id="student-waiting" class="big-status">
+    <div class="big-icon pulse">⏳</div>
+    <h2>Waiting for instructor to open bidding...</h2>
+    <p style="color:var(--muted);font-size:13px;margin-top:6px" id="student-name-display"></p>
+  </div>
+  <div id="student-bidding" style="display:none">
+    <h1 style="margin-bottom:1.5rem">Place your bid</h1>
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Company</div><div class="metric-val" id="s-company" style="font-size:15px">--</div></div>
+      <div class="metric"><div class="metric-label">Price band</div><div class="metric-val" id="s-band" style="font-size:15px">--</div></div>
+      <div class="metric"><div class="metric-label">Your funds</div><div class="metric-val" id="s-funds" style="font-size:15px">--</div></div>
+    </div>
+    <div class="card">
+      <div class="form-row">
+        <div class="form-group"><label>Bid price (&#8377;)</label><input type="number" id="s-price" oninput="updateBidCalc()"/><span class="hint" id="s-price-hint"></span></div>
+        <div class="form-group"><label>Number of lots</label><input type="number" id="s-lots" value="0" min="0" oninput="updateBidCalc()"/><span class="hint" id="s-lots-hint"></span></div>
+      </div>
+      <div class="bid-calc">
+        <div class="bid-calc-item"><label>Shares bidding</label><div class="val" id="bc-shares">0</div></div>
+        <div class="bid-calc-item"><label>Total bid amount</label><div class="val" id="bc-cost">&#8377;0</div></div>
+        <div class="bid-calc-item"><label>Remaining funds</label><div class="val" id="bc-rem">--</div></div>
+      </div>
+      <div class="error-msg" id="bid-error"></div>
+      <button class="btn primary" id="btn-submit-bid" onclick="submitBid()" style="width:100%;justify-content:center">Submit bid &rarr;</button>
+    </div>
+    <div class="card" style="background:var(--accent-bg);border-color:var(--accent-border)">
+      <h3 style="color:var(--accent);margin-bottom:6px">How book building works</h3>
+      <p style="font-size:13px">The cut-off price is where the company raises its full target. <strong>Everyone pays the same cut-off price</strong>. If you bid higher, you get refunded the difference. Bid below cut-off = no allotment. Unused funds earn interest.</p>
+    </div>
+  </div>
+  <div id="student-submitted" style="display:none" class="big-status">
+    <div class="big-icon">✅</div><h2>Bid submitted!</h2>
+    <div class="card" style="text-align:left;max-width:360px;margin:1rem auto 0"><div id="submitted-summary" style="font-size:13px;color:var(--ink2)"></div></div>
+    <p style="color:var(--faint);font-size:13px;margin-top:1rem" class="pulse">Waiting for instructor to close the book...</p>
+  </div>
+  <div id="student-result" style="display:none">
+    <h1 style="margin-bottom:1.5rem">Your result</h1>
+    <div id="student-result-content"></div>
+    <div id="student-leaderboard-section" style="display:none;margin-top:1.5rem">
+      <h2 style="margin-bottom:.5rem">🏆 Class leaderboard</h2>
+      <div class="lb-legend" style="margin-bottom:10px">
+        <span><div class="lb-legend-dot" style="background:var(--accent)"></div>Allotment</span>
+        <span><div class="lb-legend-dot" style="background:#93C5FD"></div>Unused funds</span>
+        <span><div class="lb-legend-dot" style="background:var(--success)"></div>Interest</span>
+      </div>
+      <div class="leaderboard" id="student-lb-rows"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
 // --- Firebase REST API (no SDK) ---
 const DB = 'https://ipo-game-default-rtdb.asia-southeast1.firebasedatabase.app';
 

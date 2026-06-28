@@ -153,6 +153,23 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
   </div>
 </div>
 
+<div class="screen" id="screen-password">
+  <div style="max-width:400px;margin:4rem auto">
+    <h1 style="margin-bottom:4px">Instructor login</h1>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:1.5rem">Enter the instructor password to continue</p>
+    <div class="card">
+      <div class="form-group" style="margin-bottom:1rem">
+        <label>Password</label>
+        <input type="password" id="pwd-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkPassword()"/>
+      </div>
+      <div class="error-msg" id="pwd-error" style="display:none">Incorrect password. Please try again.</div>
+      <div class="btn-row" style="margin-top:.75rem">
+        <button class="btn primary" onclick="checkPassword()">Continue &rarr;</button>
+        <button class="btn" onclick="showScreen('screen-landing')">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="screen" id="screen-join">
   <h1 style="margin-bottom:4px">Join a game</h1>
   <p style="color:var(--muted);font-size:14px;margin-bottom:1.5rem">Enter your name and the room code your instructor shared</p>
@@ -398,11 +415,16 @@ let unsubListeners=[];
 
 // --- instructor ---
 function goInstructor(){
-  const pwd = prompt('Enter instructor password:');
+  showScreen('screen-password');
+}
+function checkPassword(){
+  const pwd = document.getElementById('pwd-input').value;
+  const err = document.getElementById('pwd-error');
   if(pwd !== 'IPO2024'){
-    alert('Incorrect password.');
+    err.style.display='block';
     return;
   }
+  err.style.display='none';
   myRole='instructor';
   document.getElementById('hpill-role').textContent='Instructor';
   showScreen('screen-instructor'); showItab('itab-setup');

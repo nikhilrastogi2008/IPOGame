@@ -194,10 +194,8 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
     </div>
     <h2>Student settings</h2>
     <div class="card">
-      <div class="form-row tri">
+      <div class="form-row">
         <div class="form-group"><label>Notional funds per student (&#8377;)</label><input type="number" id="i-funds" value="500000"/></div>
-        <div class="form-group"><label>Interest rate (%)</label><input type="number" id="i-rate" value="6" step="0.1"/></div>
-        <div class="form-group"><label>Investment period (months)</label><input type="number" id="i-period" value="12"/></div>
       </div>
     </div>
     <div class="btn-row"><button class="btn primary" id="btn-create" onclick="createRoom()">Create room &amp; get code &rarr;</button></div>
@@ -262,7 +260,7 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
       <div class="lb-legend">
         <span><div class="lb-legend-dot" style="background:var(--accent)"></div>Shares allotted</span>
         <span><div class="lb-legend-dot" style="background:#93C5FD"></div>Unused funds</span>
-        <span><div class="lb-legend-dot" style="background:var(--success)"></div>Interest earned</span>
+        
       </div>
       <div class="leaderboard" id="lb-rows"></div>
       <div class="card" style="background:var(--accent-bg);border-color:var(--accent-border)">
@@ -321,7 +319,7 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
       <div class="lb-legend" style="margin-bottom:10px">
         <span><div class="lb-legend-dot" style="background:var(--accent)"></div>Allotment</span>
         <span><div class="lb-legend-dot" style="background:#93C5FD"></div>Unused funds</span>
-        <span><div class="lb-legend-dot" style="background:var(--success)"></div>Interest</span>
+        
       </div>
       <div class="leaderboard" id="student-lb-rows"></div>
     </div>
@@ -427,8 +425,6 @@ async function createRoom(){
     lot:parseInt(document.getElementById('i-lot').value)||100,
     target,
     funds:parseFloat(document.getElementById('i-funds').value)||500000,
-    rate:parseFloat(document.getElementById('i-rate').value)||6,
-    period:parseInt(document.getElementById('i-period').value)||12,
     phase:'lobby', code:myRoomCode, createdAt:Date.now()
   };
   await dbSet(`rooms/${myRoomCode}/config`, config);
@@ -603,17 +599,15 @@ async function closeBookCalc(cfg, students, bids){
       const isBelowCutoff=b&&b.lots&&bidPrice<cutoffPrice;
       const unused=cfg.funds;
       allotments[s.id]={allotted:0,cost:0,refund:0,unused,
-        interest:unused*(cfg.rate/100)*(cfg.period/12),
         status:(!b||!b.lots)?'no-bid':isBelowCutoff?'below-cutoff':'no-allot'};
     } else {
       const cost=allottedShares*cutoffPrice;
       const refund=(bidPrice-cutoffPrice)*allottedShares+(bidShares-allottedShares)*bidPrice;
       const unused=cfg.funds-cost;
       allotments[s.id]={allotted:allottedShares,cost,refund,unused,
-        interest:unused*(cfg.rate/100)*(cfg.period/12),
         status:allottedShares>=bidShares?'full':'partial'};
     }
-    allotments[s.id].totalWealth=allotments[s.id].cost+allotments[s.id].unused+allotments[s.id].interest;
+    allotments[s.id].totalWealth=allotments[s.id].cost+allotments[s.id].unused;
   });
 
   // Rank by total wealth
@@ -646,7 +640,7 @@ function renderLeaderboard(cfg,results,students,bids,el){
   const maxW=Math.max(...sorted.map(s=>(allotments[s.id]||{}).totalWealth||0),1);
   const medals=['\u1F947','\u1F948','\u1F949'];
   el.innerHTML=sorted.map(s=>{
-    const a=allotments[s.id]||{totalWealth:cfg.funds,cost:0,unused:cfg.funds,interest:0,status:'no-bid',rank:99};
+    const a=allotments[s.id]||{totalWealth:cfg.funds,cost:0,unused:cfg.funds,status:'no-bid',rank:99};
     const rank=a.rank||99;
     const sc=w=>Math.max(Math.round((w/maxW)*180),3);
     return `<div class="lb-row ${rank<=3?'rank-'+rank:''}">
@@ -658,8 +652,7 @@ function renderLeaderboard(cfg,results,students,bids,el){
         <div class="lb-bars">
           <div class="lb-bar-seg allotment" style="width:${sc(a.cost)}px"></div>
           <div class="lb-bar-seg unused" style="width:${sc(a.unused)}px"></div>
-          <div class="lb-bar-seg interest" style="width:${sc(a.interest)}px"></div>
-        </div>
+          </div>
       </div>
       <div class="lb-wealth">
         <div class="lb-wealth-val">\u20B9${fmt(a.totalWealth)}</div>
@@ -706,15 +699,14 @@ function showFinalResults(cfg,results,students,bids){
       <td>\u20B9${fmt(a.cost||0)}</td>
       <td style="color:var(--success)">+\u20B9${fmt(a.refund||0)}</td>
       <td>\u20B9${fmt(a.unused??cfg.funds)}</td>
-      <td style="color:var(--success)">+\u20B9${fmt(a.interest||0)}</td>
-      <td style="font-weight:600;color:var(--accent)">\u20B9${fmt(a.totalWealth||0)}</td>
+      <td style="<td style="font-weight:600;color:var(--accent)">\u20B9${fmt(a.totalWealth||0)}</td>
       <td>${badge}</td>
     </tr>`;
   });
   document.getElementById('final-table').innerHTML=`
     <div class="card"><h3 style="margin-bottom:12px">Allotment summary</h3>
       <div class="table-wrap"><table>
-        <thead><tr><th>Rank \u00B7 Student</th><th>Bid price</th><th>Cut-off price</th><th>Bid shares</th><th>Allotted</th><th>Amount paid</th><th>Refund</th><th>Unused cash</th><th>Interest</th><th>Total wealth</th><th>Status</th></tr></thead>
+        <thead><tr><th>Rank \u00B7 Student</th><th>Bid price</th><th>Cut-off price</th><th>Bid shares</th><th>Allotted</th><th>Amount paid</th><th>Refund</th><th>Unused cash</th><th>Total wealth</th><th>Status</th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>
     </div>`;
@@ -788,17 +780,14 @@ async function joinGame(){
 
 async function listenStudentPhase(){
   await waitForDB();
-  // Real-time listener \u2014 updates instantly when instructor changes phase
   const unsub=dbOn(`rooms/${myRoomCode}/config`, cfg=>{
     if(!cfg) return;
     sConfig=cfg;
     if(cfg.phase==='results'){
-      // Hide waiting/submitted screens immediately
-      document.getElementById('student-waiting').style.display='none';
-      document.getElementById('student-submitted').style.display='none';
-      // Show loading message while fetching results
+      if(_studentResultShown) return; // already showing results, don't re-render
       document.getElementById('student-waiting').style.display='block';
-      document.getElementById('student-waiting').querySelector('h2').textContent='Results are ready! Loading\u2026';
+      document.getElementById('student-submitted').style.display='none';
+      document.getElementById('student-waiting').querySelector('h2').textContent='Results are ready! Loading…';
 
       function fetchAndShowResults(retries){
         Promise.all([
@@ -819,7 +808,6 @@ async function listenStudentPhase(){
           if(al) showStudentResult(cfg,results,al,b,students,bids);
           else {
             const dummyAl={allotted:0,cost:0,refund:0,unused:cfg.funds,
-              interest:cfg.funds*(cfg.rate/100)*(cfg.period/12),
               status:'no-bid',rank:students.length,
               totalWealth:cfg.funds+cfg.funds*(cfg.rate/100)*(cfg.period/12)};
             showStudentResult(cfg,results,dummyAl,null,students,bids);
@@ -898,6 +886,7 @@ async function submitBid(){
 }
 
 function showStudentResult(cfg,results,al,b,students,bids){
+  _studentResultShown = true;
   document.getElementById('student-waiting').style.display='none';
   document.getElementById('student-bidding').style.display='none';
   document.getElementById('student-submitted').style.display='none';
@@ -924,18 +913,19 @@ function showStudentResult(cfg,results,al,b,students,bids){
       <div class="metric"><div class="metric-label">Amount paid</div><div class="metric-val">\u20B9${fmt(al.cost||0)}</div></div>
       <div class="metric"><div class="metric-label">Refund received</div><div class="metric-val" style="color:var(--success)">+\u20B9${fmt(al.refund||0)}</div></div>
       <div class="metric"><div class="metric-label">Unused cash</div><div class="metric-val">\u20B9${fmt(al.unused??cfg.funds)}</div></div>
-      <div class="metric"><div class="metric-label">Interest earned</div><div class="metric-val" style="color:var(--success)">+\u20B9${fmt(al.interest||0)}</div></div>
+      <div style="display:none"><div class="metric-label">Interest earned</div><div class="metric-val" style="</div>
       <div class="metric"><div class="metric-label">Total wealth</div><div class="metric-val" style="color:var(--accent)">\u20B9${fmt(al.totalWealth||0)}</div></div>
     </div>
     <div class="card" style="background:var(--accent-bg);border-color:var(--accent-border)">
       <h3 style="color:var(--accent);margin-bottom:8px">What happened</h3>
-      <p style="font-size:13px">The cut-off price (\u20B9${fmtD(cp,2)}) is where cumulative demand met the company's fundraise target. ${b&&b.price>=cp?`Your bid of \u20B9${b.price} was at or above cut-off \u2014 you qualified for allotment. You paid \u20B9${fmtD(cp,2)} per share (not your bid price) and received \u20B9${fmt(al.refund||0)} as refund.`:`Your bid of \u20B9${b?.price||'\u2014'} was below the cut-off \u2014 no allotment, all funds returned.`} Unused cash earns ${fmtD(cfg.rate,1)}% interest for ${cfg.period} months.</p>
+      <p style="font-size:13px">The cut-off price (\u20B9${fmtD(cp,2)}) is where cumulative demand met the company's fundraise target. ${b&&b.price>=cp?`Your bid of \u20B9${b.price} was at or above cut-off \u2014 you qualified for allotment. You paid \u20B9${fmtD(cp,2)} per share (not your bid price) and received \u20B9${fmt(al.refund||0)} as refund.`:`Your bid of \u20B9${b?.price||'\u2014'} was below the cut-off \u2014 no allotment, all funds returned.`}</p>
     </div>`;
   document.getElementById('student-leaderboard-section').style.display='block';
   renderLeaderboard(cfg,results,students,bids,document.getElementById('student-lb-rows'));
 }
 // --- Market price & CSV ---
 let currentResults = null;
+let _studentResultShown = false;
 let currentCfg = null;
 let currentStudents = null;
 let currentBids = null;
@@ -1010,10 +1000,7 @@ function downloadCSV() {
     ['Shares issued', ts],
     ['Market price', mp || 'Not set'],
     [],
-    ['Student','Bid price','Bid lots','Bid shares','Allotted shares',
-     'Amount paid (at cut-off)','Refund','Unused cash',
-     mp ? 'Market value of shares' : '',
-     'Total wealth','Status','Rank']
+    ['Student','Bid price','Bid lots','Bid shares','Allotted shares','Amount paid (at cut-off)','Refund','Unused cash', mp?'Market value of shares':'','Total wealth','Status','Rank']
   ];
 
   currentStudents.forEach(s => {
@@ -1032,8 +1019,8 @@ function downloadCSV() {
       a.cost || 0,
       a.refund || 0,
       a.unused != null ? a.unused : cfg.funds,
-      mp ? (a.allotted || 0) * mp : '',
-      a.totalWealth || 0,
+      mp ? (a.allotted||0)*mp : '',
+      a.totalWealth||0,
       status,
       a.rank || ''
     ]);

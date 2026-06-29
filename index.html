@@ -5,15 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>IPO Book Building Game</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--ink:#111827;--ink2:#374151;--muted:#6B7280;--faint:#9CA3AF;--border:#E5E7EB;--border2:#D1D5DB;--surface:#F9FAFB;--white:#fff;--accent:#2563EB;--accent-bg:#EFF6FF;--accent-border:#BFDBFE;--success:#059669;--success-bg:#ECFDF5;--success-border:#A7F3D0;--warn:#D97706;--warn-bg:#FFFBEB;--warn-border:#FDE68A;--danger:#DC2626;--danger-bg:#FEF2F2;--danger-border:#FECACA;--radius:10px;--radius-sm:6px;--mono:'JetBrains Mono',monospace}
-html{font-size:15px}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;line-height:1.6}
-.screen{display:none}
-.screen.active{display:block}
-.itab{display:none}
-.itab.active{display:block}
+:root{
+  --ink:#111827;--ink2:#374151;--muted:#6B7280;--faint:#9CA3AF;
+  --border:#E5E7EB;--border2:#D1D5DB;--surface:#F9FAFB;--white:#fff;
+  --accent:#2563EB;--accent-bg:#EFF6FF;--accent-border:#BFDBFE;
+  --success:#059669;--success-bg:#ECFDF5;--success-border:#A7F3D0;
+  --warn:#D97706;--warn-bg:#FFFBEB;--warn-border:#FDE68A;
+  --danger:#DC2626;--danger-bg:#FEF2F2;--danger-border:#FECACA;
+  --radius:10px;--radius-sm:6px;--mono:'JetBrains Mono',monospace
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;line-height:1.6;font-size:15px}
+.screen{display:none}.screen.active{display:block}
+.itab{display:none}.itab.active{display:block}
 .app-header{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;gap:12px;height:56px;position:sticky;top:0;z-index:100}
 .logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
 .logo-icon{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
@@ -22,7 +27,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--surface);color:va
 .page{max-width:820px;margin:0 auto;padding:2rem 1.5rem}
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:1rem}
 label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px;font-weight:500}
-input[type=text],input[type=number]{width:100%;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;color:var(--ink);background:var(--white);outline:none;transition:border-color .15s}
+input[type=text],input[type=number],input[type=password]{width:100%;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;color:var(--ink);background:var(--white);outline:none;transition:border-color .15s}
 input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
 .form-row.tri{grid-template-columns:1fr 1fr 1fr}
@@ -54,8 +59,8 @@ input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
 .progress-inner{height:100%;border-radius:4px;background:var(--accent);transition:width .4s}
 .progress-inner.over{background:var(--danger)}
 .table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:620px}
-th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);padding:8px 10px;border-bottom:1px solid var(--border)}
 td{padding:10px;border-bottom:1px solid var(--border);color:var(--ink2);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--surface)}
@@ -79,15 +84,14 @@ tr:hover td{background:var(--surface)}
 .bid-calc-item .val{font-size:16px;font-weight:600;color:var(--ink);margin-top:2px}
 .landing-hero{text-align:center;padding:3rem 1rem 2rem}
 .landing-hero h1{font-size:28px;font-weight:600;margin-bottom:8px}
-.landing-hero p{color:var(--muted);font-size:15px;margin-bottom:2rem}
-.landing-cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem}
-.landing-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;cursor:pointer;transition:border-color .15s,box-shadow .15s;text-align:left}
+.landing-hero p{color:var(--muted);font-size:15px}
+.landing-cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:2rem 0}
+.landing-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:2rem 1.5rem;cursor:pointer;transition:border-color .15s,box-shadow .15s;text-align:center}
 .landing-card:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
-.landing-card-icon{font-size:28px;margin-bottom:12px}
-.landing-card h2{font-size:15px;font-weight:600;margin-bottom:4px}
+.landing-card-icon{font-size:36px;margin-bottom:12px}
+.landing-card h2{font-size:16px;font-weight:600;margin-bottom:6px}
 .landing-card p{font-size:13px;color:var(--muted)}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
-.spinner.dark{border-color:var(--border2);border-top-color:var(--accent)}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .pulse{animation:pulse 1.8s infinite}
@@ -100,28 +104,11 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
 .lb-row.rank-2{background:linear-gradient(135deg,#F8FAFC,#F1F5F9);border-color:#CBD5E1}
 .lb-row.rank-3{background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA}
 .lb-rank{font-size:22px;width:36px;text-align:center;flex-shrink:0}
-.lb-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
-.lb-row.rank-1 .lb-avatar{background:#FDE68A;color:#92400E;border:2px solid #F59E0B}
-.lb-row.rank-2 .lb-avatar{background:#E2E8F0;color:#475569;border:2px solid #94A3B8}
-.lb-row.rank-3 .lb-avatar{background:#FED7AA;color:#9A3412;border:2px solid #F97316}
-.lb-avatar-default{background:var(--accent-bg);color:var(--accent);border:2px solid var(--accent-border)}
-.lb-info{flex:1;min-width:0}
-.lb-name{font-size:14px;font-weight:600;color:var(--ink)}
-.lb-detail{font-size:12px;color:var(--muted);margin-top:1px}
-.lb-bars{display:flex;gap:4px;margin-top:6px;align-items:center}
-.lb-bar-seg{height:6px;border-radius:3px;min-width:3px}
-.lb-bar-seg.allotment{background:var(--accent)}
-.lb-bar-seg.unused{background:#93C5FD}
-.lb-bar-seg.interest{background:var(--success)}
-.lb-wealth{text-align:right;flex-shrink:0}
-.lb-wealth-val{font-size:18px;font-weight:600;color:var(--ink)}
-.lb-wealth-label{font-size:11px;color:var(--muted)}
-.lb-legend{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap}
-.lb-legend span{display:flex;align-items:center;gap:4px}
-.lb-legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
-.lb-student-pos{font-size:64px;font-weight:600;text-align:center;line-height:1}
-.lb-student-subtitle{font-size:14px;color:var(--muted);text-align:center;margin-top:4px;margin-bottom:1.5rem}
-@media(max-width:600px){.form-row,.form-row.tri{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.landing-cards{grid-template-columns:1fr}.bid-calc{grid-template-columns:1fr 1fr}.room-code{font-size:36px}.page{padding:1.25rem 1rem}.lb-bars{display:none}}
+.lb-name{font-size:14px;font-weight:600}
+.lb-detail{font-size:12px;color:var(--muted);margin-top:2px}
+.lb-wealth{margin-left:auto;text-align:right;font-size:18px;font-weight:700;color:var(--accent)}
+.lb-sub{font-size:11px;color:var(--muted)}
+@media(max-width:600px){.form-row,.form-row.tri{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.landing-cards{grid-template-columns:1fr}.bid-calc{grid-template-columns:1fr 1fr}.room-code{font-size:36px}.page{padding:1.25rem 1rem}}
 </style>
 </head>
 <body>
@@ -132,6 +119,7 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
 </header>
 <div class="page">
 
+<!-- LANDING -->
 <div class="screen active" id="screen-landing">
   <div class="landing-hero">
     <h1>IPO Book Building Simulation</h1>
@@ -139,11 +127,13 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
   </div>
   <div class="landing-cards">
     <div class="landing-card" onclick="goInstructor()">
-      <div class="landing-card-icon">&#x1F393;</div><h2>Instructor</h2>
+      <div class="landing-card-icon">&#x1F393;</div>
+      <h2>Instructor</h2>
       <p>Set up an IPO, share the room code, and reveal results to the class</p>
     </div>
     <div class="landing-card" onclick="showScreen('screen-join')">
-      <div class="landing-card-icon">&#x1F64B;</div><h2>Student</h2>
+      <div class="landing-card-icon">&#x1F64B;</div>
+      <h2>Student</h2>
       <p>Join your class game with a room code and place your bid privately</p>
     </div>
   </div>
@@ -153,13 +143,37 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
   </div>
 </div>
 
+<!-- PASSWORD -->
+<div class="screen" id="screen-password">
+  <div style="max-width:400px;margin:4rem auto">
+    <h1 style="margin-bottom:4px">Instructor login</h1>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:1.5rem">Enter the instructor password to continue</p>
+    <div class="card">
+      <div class="form-group" style="margin-bottom:1rem">
+        <label>Password</label>
+        <input type="password" id="pwd-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkPassword()"/>
+      </div>
+      <div class="error-msg" id="pwd-error" style="display:none;margin-bottom:8px">Incorrect password. Please try again.</div>
+      <div class="btn-row" style="margin-top:.75rem">
+        <button class="btn primary" onclick="checkPassword()">Continue &rarr;</button>
+        <button class="btn" onclick="showScreen('screen-landing')">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JOIN -->
 <div class="screen" id="screen-join">
   <h1 style="margin-bottom:4px">Join a game</h1>
   <p style="color:var(--muted);font-size:14px;margin-bottom:1.5rem">Enter your name and the room code your instructor shared</p>
   <div class="card">
     <div class="form-row">
-      <div class="form-group"><label>Your name</label><input type="text" id="join-name" placeholder="e.g. Arjun Sharma"/></div>
-      <div class="form-group"><label>Room code</label>
+      <div class="form-group">
+        <label>Your name</label>
+        <input type="text" id="join-name" placeholder="e.g. Arjun Sharma"/>
+      </div>
+      <div class="form-group">
+        <label>Room code</label>
         <input type="text" id="join-code" placeholder="e.g. AB12" maxlength="4" style="text-transform:uppercase;font-family:var(--mono);font-size:20px;letter-spacing:.12em" oninput="this.value=this.value.toUpperCase()"/>
       </div>
     </div>
@@ -171,13 +185,16 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
   </div>
 </div>
 
+<!-- INSTRUCTOR -->
 <div class="screen" id="screen-instructor">
   <div class="tabs">
-    <button class="tab active" onclick="showItab('itab-setup')">Setup</button>
-    <button class="tab" onclick="showItab('itab-lobby')">Lobby</button>
-    <button class="tab" onclick="showItab('itab-results')">Results</button>
-    <button class="tab" onclick="showItab('itab-leaderboard')">&#x1F3C6; Leaderboard</button>
+    <button class="tab active" id="tab-setup" onclick="showItab('itab-setup')">Setup</button>
+    <button class="tab" id="tab-lobby" onclick="showItab('itab-lobby')">Lobby</button>
+    <button class="tab" id="tab-results" onclick="showItab('itab-results')">Results</button>
+    <button class="tab" id="tab-leaderboard" onclick="showItab('itab-leaderboard')">&#x1F3C6; Leaderboard</button>
   </div>
+
+  <!-- SETUP -->
   <div class="itab active" id="itab-setup">
     <h2>IPO configuration</h2>
     <div class="card">
@@ -198,49 +215,64 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
         <div class="form-group"><label>Notional funds per student (&#8377;)</label><input type="number" id="i-funds" value="500000"/></div>
       </div>
     </div>
-    <div class="btn-row"><button class="btn primary" id="btn-create" onclick="createRoom()">Create room &amp; get code &rarr;</button></div>
+    <div class="btn-row">
+      <button class="btn primary" id="btn-create" onclick="createRoom()">Create room &amp; get code &rarr;</button>
+    </div>
   </div>
+
+  <!-- LOBBY -->
   <div class="itab" id="itab-lobby">
     <div style="text-align:center;margin-bottom:1.5rem">
       <p style="font-size:13px;color:var(--muted);margin-bottom:4px">Share this code with your students</p>
-      <div class="room-code" id="display-code">--</div>
-      <p style="font-size:12px;color:var(--faint)">Students open the file and click Student &rarr; Join a game</p>
+      <div class="room-code" id="display-code">----</div>
     </div>
     <div class="metrics">
       <div class="metric"><div class="metric-label">Company</div><div class="metric-val" id="lob-company" style="font-size:15px">--</div></div>
       <div class="metric"><div class="metric-label">Price band</div><div class="metric-val" id="lob-band" style="font-size:15px">--</div></div>
       <div class="metric"><div class="metric-label">Students joined</div><div class="metric-val" id="lob-count">0</div></div>
     </div>
-    <div class="card"><h3 style="margin-bottom:12px">Students in lobby</h3><div id="lobby-list"><p style="font-size:13px;color:var(--faint)">Waiting for students...</p></div></div>
-    <div class="btn-row"><button class="btn primary" id="btn-open-bids" onclick="openBidding()" disabled>Open bidding &rarr;</button><button class="btn" onclick="pollBids()">&#8635; Refresh</button></div>
+    <div class="card">
+      <h3 style="margin-bottom:12px">Students in lobby</h3>
+      <div id="lobby-list"><p style="font-size:13px;color:var(--faint)">Waiting for students...</p></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" id="btn-open-bids" onclick="openBidding()" disabled>Open bidding &rarr;</button>
+    </div>
   </div>
+
+  <!-- RESULTS -->
   <div class="itab" id="itab-results">
-    <div id="results-waiting" class="big-status"><div class="big-icon">&#x1F4CB;</div><p style="color:var(--muted)">Open bidding first from the Lobby tab</p></div>
+    <div id="results-waiting" class="big-status">
+      <div class="big-icon">&#x1F4CB;</div>
+      <p style="color:var(--muted)">Open bidding first from the Lobby tab</p>
+    </div>
     <div id="results-live" style="display:none">
       <div class="card">
         <div class="section-label">Bid submissions</div>
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span id="bid-progress-label" style="color:var(--muted)">0 / 0 submitted</span><span id="bid-progress-pct" style="font-weight:600">0%</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+          <span id="bid-progress-label" style="color:var(--muted)">0 / 0 submitted</span>
+          <span id="bid-progress-pct" style="font-weight:600">0%</span>
+        </div>
         <div class="progress-outer"><div class="progress-inner" id="bid-progress-bar" style="width:0%"></div></div>
       </div>
       <div class="card">
-        <div class="section-label">Order book</div>
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span id="book-label" style="color:var(--muted)">0 shares bid</span><span id="book-pct" style="font-weight:600">--</span></div>
-        <div class="progress-outer"><div class="progress-inner" id="book-bar" style="width:0%"></div></div>
+        <h3 style="margin-bottom:12px">Student bid status</h3>
+        <div id="bid-status-rows"></div>
       </div>
-      <div class="card"><h3 style="margin-bottom:12px">Student bid status</h3><div id="bid-status-rows"></div></div>
       <div class="btn-row">
-        <button class="btn primary" id="btn-close-book" onclick="closeBook()" disabled>Close book &amp; reveal results &rarr;</button>
+        <button class="btn primary" id="btn-close-book" onclick="closeBook()">Close book &amp; reveal results &rarr;</button>
         <button class="btn" onclick="pollBids()">&#8635; Refresh</button>
       </div>
     </div>
     <div id="results-final" style="display:none">
-      <div id="final-summary"></div><div id="final-table"></div>
-      <div class="card" style="background:var(--warn-bg);border-color:var(--warn-border);margin-top:0">
-        <h3 style="color:var(--warn);margin-bottom:8px">&#x1F4C8; Set listing/market price</h3>
-        <p style="font-size:13px;margin-bottom:12px">Enter the market price at which the stock is now trading. Wealth = allotted shares &times; market price + unused cash.</p>
-        <div style="display:flex;gap:12px;align-items:flex-end">
-          <div class="form-group" style="flex:1">
-            <label>Market / listing price (&#8377;)</label>
+      <div id="final-summary"></div>
+      <div id="final-table"></div>
+      <div class="card" style="background:var(--warn-bg);border-color:var(--warn-border)">
+        <h3 style="color:var(--warn);margin-bottom:8px">&#x1F4C8; Set market / listing price</h3>
+        <p style="font-size:13px;margin-bottom:12px">Enter the price at which the stock is now trading. Wealth = allotted shares &times; market price + unused cash.</p>
+        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+          <div class="form-group" style="flex:1;min-width:160px">
+            <label>Market price (&#8377;)</label>
             <input type="number" id="market-price" placeholder="e.g. 125" min="0" step="0.01"/>
           </div>
           <button class="btn primary" onclick="applyMarketPrice()">Apply &amp; update leaderboard</button>
@@ -248,37 +280,34 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
       </div>
       <div class="btn-row">
         <button class="btn primary" onclick="showItab('itab-leaderboard')">&#x1F3C6; View leaderboard &rarr;</button>
-        <button class="btn" onclick="downloadCSV()">&#x2B07; Download results (CSV)</button>
+        <button class="btn" onclick="downloadCSV()">&#x2B07; Download CSV</button>
         <button class="btn danger-btn" onclick="endGame()">End game</button>
       </div>
     </div>
   </div>
+
+  <!-- LEADERBOARD -->
   <div class="itab" id="itab-leaderboard">
-    <div id="leaderboard-waiting" class="big-status"><div class="big-icon">&#x1F3C6;</div><p style="color:var(--muted)">Leaderboard appears after you close the book</p></div>
+    <div id="leaderboard-waiting" class="big-status">
+      <div class="big-icon">&#x1F3C6;</div>
+      <p style="color:var(--muted)">Leaderboard appears after you close the book</p>
+    </div>
     <div id="leaderboard-content" style="display:none">
       <div id="lb-header" style="margin-bottom:1rem"></div>
-      <div class="lb-legend">
-        <span><div class="lb-legend-dot" style="background:var(--accent)"></div>Shares allotted</span>
-        <span><div class="lb-legend-dot" style="background:#93C5FD"></div>Unused funds</span>
-        
-      </div>
       <div class="leaderboard" id="lb-rows"></div>
-      <div class="card" style="background:var(--accent-bg);border-color:var(--accent-border)">
-        <h3 style="color:var(--accent);margin-bottom:8px">Strategy debrief</h3>
-        <div id="lb-debrief" style="font-size:13px;color:var(--ink2)"></div>
-      </div>
       <div class="btn-row">
-        <button class="btn" onclick="downloadCSV()">&#x2B07; Download results (CSV)</button>
+        <button class="btn" onclick="downloadCSV()">&#x2B07; Download CSV</button>
         <button class="btn danger-btn" onclick="endGame()">End game</button>
       </div>
     </div>
   </div>
 </div>
 
+<!-- STUDENT -->
 <div class="screen" id="screen-student">
   <div id="student-waiting" class="big-status">
     <div class="big-icon pulse">&#x23F3;</div>
-    <h2>Waiting for instructor to open bidding...</h2>
+    <h2>Waiting for instructor...</h2>
     <p style="color:var(--muted);font-size:13px;margin-top:6px" id="student-name-display"></p>
   </div>
   <div id="student-bidding" style="display:none">
@@ -290,8 +319,16 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
     </div>
     <div class="card">
       <div class="form-row">
-        <div class="form-group"><label>Bid price (&#8377;)</label><input type="number" id="s-price" oninput="updateBidCalc()"/><span class="hint" id="s-price-hint"></span></div>
-        <div class="form-group"><label>Number of lots</label><input type="number" id="s-lots" value="0" min="0" oninput="updateBidCalc()"/><span class="hint" id="s-lots-hint"></span></div>
+        <div class="form-group">
+          <label>Bid price (&#8377;)</label>
+          <input type="number" id="s-price" oninput="updateBidCalc()"/>
+          <span class="hint" id="s-price-hint"></span>
+        </div>
+        <div class="form-group">
+          <label>Number of lots</label>
+          <input type="number" id="s-lots" value="1" min="1" oninput="updateBidCalc()"/>
+          <span class="hint" id="s-lots-hint"></span>
+        </div>
       </div>
       <div class="bid-calc">
         <div class="bid-calc-item"><label>Shares bidding</label><div class="val" id="bc-shares">0</div></div>
@@ -303,759 +340,745 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
     </div>
     <div class="card" style="background:var(--accent-bg);border-color:var(--accent-border)">
       <h3 style="color:var(--accent);margin-bottom:6px">How book building works</h3>
-      <p style="font-size:13px">The cut-off price is where the company raises its full target. <strong>Everyone pays the same cut-off price</strong>. If you bid higher, you get refunded the difference. Bid below cut-off = no allotment. Unused funds earn interest.</p>
+      <p style="font-size:13px">The cut-off price is where the company raises its full target. <strong>Everyone pays the same cut-off price</strong> regardless of what they bid. If you bid higher, you get the difference refunded. Bid below cut-off = no allotment.</p>
     </div>
   </div>
   <div id="student-submitted" style="display:none" class="big-status">
-    <div class="big-icon">&#x2705;</div><h2>Bid submitted!</h2>
-    <div class="card" style="text-align:left;max-width:360px;margin:1rem auto 0"><div id="submitted-summary" style="font-size:13px;color:var(--ink2)"></div></div>
+    <div class="big-icon">&#x2705;</div>
+    <h2>Bid submitted!</h2>
+    <div class="card" style="text-align:left;max-width:380px;margin:1rem auto 0">
+      <div id="submitted-summary" style="font-size:13px;color:var(--ink2)"></div>
+    </div>
     <p style="color:var(--faint);font-size:13px;margin-top:1rem" class="pulse">Waiting for instructor to close the book...</p>
   </div>
   <div id="student-result" style="display:none">
     <h1 style="margin-bottom:1.5rem">Your result</h1>
     <div id="student-result-content"></div>
     <div id="student-leaderboard-section" style="display:none;margin-top:1.5rem">
-      <h2 style="margin-bottom:.5rem">&#x1F3C6; Class leaderboard</h2>
-      <div class="lb-legend" style="margin-bottom:10px">
-        <span><div class="lb-legend-dot" style="background:var(--accent)"></div>Allotment</span>
-        <span><div class="lb-legend-dot" style="background:#93C5FD"></div>Unused funds</span>
-        
-      </div>
+      <h2 style="margin-bottom:.75rem">&#x1F3C6; Class leaderboard</h2>
       <div class="leaderboard" id="student-lb-rows"></div>
     </div>
   </div>
 </div>
 
-</div>
+</div><!-- end .page -->
 <script>
-// --- Firebase REST API (no SDK) ---
-const DB = 'https://ipo-game-default-rtdb.asia-southeast1.firebasedatabase.app';
+// ============================================================
+// Firebase REST API helpers (no SDK needed)
+// ============================================================
+var DB = 'https://ipo-game-default-rtdb.asia-southeast1.firebasedatabase.app';
 
-async function dbGet(path) {
-  const r = await fetch(`${DB}/${path}.json`);
-  return r.json();
+function dbGet(path) {
+  return fetch(DB + '/' + path + '.json').then(function(r){ return r.json(); });
 }
-async function dbSet(path, val) {
-  await fetch(`${DB}/${path}.json`, {
+function dbSet(path, val) {
+  return fetch(DB + '/' + path + '.json', {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(val)
   });
 }
-async function dbUpdate(path, val) {
-  await fetch(`${DB}/${path}.json`, {
+function dbUpdate(path, val) {
+  return fetch(DB + '/' + path + '.json', {
     method: 'PATCH',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(val)
   });
 }
-async function dbRemove(path) {
-  await fetch(`${DB}/${path}.json`, { method: 'DELETE' });
-}
-// Simple polling-based listener
-function dbOn(path, cb) {
-  let active = true;
-  async function poll() {
-    if (!active) return;
-    try {
-      const val = await dbGet(path);
-      cb(val);
-    } catch(e) {}
-    if (active) setTimeout(poll, 3000);
-  }
-  poll();
-  return function() { active = false; };
-}
-function waitForDB() { return Promise.resolve(); }
-
-
-// --- Game logic ---
-
-
-// --- helpers ---
-function fmt(n){return Math.round(n).toLocaleString('en-IN');}
-function fmtD(n,d=2){return Number(n.toFixed(d)).toLocaleString('en-IN',{minimumFractionDigits:d,maximumFractionDigits:d});}
-function genCode(){return Math.random().toString(36).substr(2,4).toUpperCase();}
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
-function showItab(id){
-  document.querySelectorAll('.itab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  ['itab-setup','itab-lobby','itab-results','itab-leaderboard'].forEach((n,i)=>{
-    if(n===id) document.querySelectorAll('.tab')[i].classList.add('active');
-  });
-}
-function setLoading(id,on,label=''){
-  const b=document.getElementById(id); if(!b)return;
-  b.disabled=on;
-  const dc=id==='btn-join'||id==='btn-create'?'dark':'';
-  b.innerHTML=on?`<span class="spinner ${dc}"></span>${label||'Please wait\u2026'}`:label;
+function dbRemove(path) {
+  return fetch(DB + '/' + path + '.json', { method: 'DELETE' });
 }
 
-let myRole='', myRoomCode='', myStudentId='';
-let sConfig=null;
-let unsubListeners=[];
+// ============================================================
+// Helpers
+// ============================================================
+function fmt(n) {
+  n = Math.round(n);
+  if (isNaN(n)) return '0';
+  return n.toLocaleString('en-IN');
+}
+function fmtD(n, d) {
+  if (isNaN(n)) return '0';
+  return Number(n).toFixed(d);
+}
+function genCode() {
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code = '';
+  for (var i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+function setLoading(id, loading, text) {
+  var btn = document.getElementById(id);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading ? '<span class="spinner"></span>' + text : text;
+}
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+function showItab(id) {
+  document.querySelectorAll('.itab').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(s){ s.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  var tabId = 'tab-' + id.replace('itab-', '');
+  var tab = document.getElementById(tabId);
+  if (tab) tab.classList.add('active');
+}
 
-// --- instructor ---
-function goInstructor(){
-  const pwd = prompt('Enter instructor password:');
-  if(pwd !== 'IPO2024'){
-    alert('Incorrect password.');
+// ============================================================
+// State
+// ============================================================
+var myRole = '';
+var myRoomCode = '';
+var myStudentId = '';
+var myStudentName = '';
+var sConfig = null;
+var currentResults = null;
+var currentCfg = null;
+var currentStudents = null;
+var currentBids = null;
+var appliedMarketPrice = 0;
+var _resultShown = false;
+
+// ============================================================
+// Instructor: password
+// ============================================================
+function goInstructor() {
+  document.getElementById('pwd-input').value = '';
+  document.getElementById('pwd-error').style.display = 'none';
+  showScreen('screen-password');
+}
+function checkPassword() {
+  var pwd = document.getElementById('pwd-input').value;
+  if (pwd !== 'IPO2024') {
+    document.getElementById('pwd-error').style.display = 'block';
     return;
   }
-  myRole='instructor';
-  document.getElementById('hpill-role').textContent='Instructor';
-  showScreen('screen-instructor'); showItab('itab-setup');
+  myRole = 'instructor';
+  document.getElementById('hpill-role').textContent = 'Instructor';
+  showScreen('screen-instructor');
+  showItab('itab-setup');
 }
 
-async function createRoom(){
-  await waitForDB();
-  try {
-  const floor=parseFloat(document.getElementById('i-floor').value);
-  const cap=parseFloat(document.getElementById('i-cap').value);
-  if(!floor||!cap){alert('Please enter floor and cap prices.');return;}
-  if(floor>=cap){alert('Floor must be less than cap.');return;}
-  const target=parseFloat(document.getElementById('i-target').value);
-  if(!target||target<=0){alert('Please enter a valid fundraise target.');return;}
-  setLoading('btn-create',true,'Creating room\u2026');
-  myRoomCode=genCode();
-  const config={
-    company:document.getElementById('i-company').value||'TechCorp',
-    floor, cap,
-    lot:parseInt(document.getElementById('i-lot').value)||100,
-    target,
-    funds:parseFloat(document.getElementById('i-funds').value)||500000,
-    phase:'lobby', code:myRoomCode, createdAt:Date.now()
+// ============================================================
+// Instructor: create room
+// ============================================================
+function createRoom() {
+  var floor = parseFloat(document.getElementById('i-floor').value);
+  var cap = parseFloat(document.getElementById('i-cap').value);
+  var target = parseFloat(document.getElementById('i-target').value);
+  var lot = parseInt(document.getElementById('i-lot').value);
+  var funds = parseFloat(document.getElementById('i-funds').value);
+  if (!floor || !cap || floor >= cap) { alert('Floor must be less than cap.'); return; }
+  if (!target || target <= 0) { alert('Enter a valid fundraise target.'); return; }
+  setLoading('btn-create', true, 'Creating room\u2026');
+  myRoomCode = genCode();
+  var config = {
+    company: document.getElementById('i-company').value || 'TechCorp Ltd',
+    floor: floor, cap: cap, lot: lot || 100,
+    target: target, funds: funds || 500000,
+    phase: 'lobby', code: myRoomCode, createdAt: Date.now()
   };
-  await dbSet(`rooms/${myRoomCode}/config`, config);
-  setLoading('btn-create',false,'Create room & get code \u2192');
-  document.getElementById('display-code').textContent=myRoomCode;
-  document.getElementById('lob-company').textContent=config.company;
-  document.getElementById('lob-band').textContent=`\u20B9${fmt(floor)} \u2013 \u20B9${fmt(cap)}`;
-  document.getElementById('hpill-room').textContent=`Room: ${myRoomCode}`;
-  document.getElementById('hpill-room').style.display='';
-  showItab('itab-lobby');
-  listenLobby();
-  } catch(e) {
+  dbSet('rooms/' + myRoomCode + '/config', config).then(function() {
+    setLoading('btn-create', false, 'Create room &amp; get code &rarr;');
+    document.getElementById('display-code').textContent = myRoomCode;
+    document.getElementById('lob-company').textContent = config.company;
+    document.getElementById('lob-band').textContent = '\u20B9' + fmt(floor) + ' \u2013 \u20B9' + fmt(cap);
+    document.getElementById('hpill-room').textContent = 'Room: ' + myRoomCode;
+    document.getElementById('hpill-room').style.display = '';
+    showItab('itab-lobby');
+    pollLobby();
+  }).catch(function(e) {
     alert('Error creating room: ' + e.message);
-    setLoading('btn-create',false,'Create room & get code \u2192');
-  }
-}
-
-async function listenLobby(){
-  await waitForDB();
-  const unsub = dbOn(`rooms/${myRoomCode}/students`, students => {
-    const list = students ? Object.values(students) : [];
-    document.getElementById('lob-count').textContent=list.length;
-    const el=document.getElementById('lobby-list');
-    el.innerHTML=list.length
-      ?list.map(s=>`<div class="student-row"><div class="avatar">${s.name.charAt(0).toUpperCase()}</div><span style="font-size:14px;font-weight:500;flex:1">${s.name}</span><span class="badge b-success">Joined</span></div>`).join('')
-      :'<p style="font-size:13px;color:var(--faint)">Waiting for students\u2026</p>';
-    document.getElementById('btn-open-bids').disabled=list.length<1;
+    setLoading('btn-create', false, 'Create room &amp; get code &rarr;');
   });
-  unsubListeners.push(unsub);
 }
 
-async function openBidding(){
-  await waitForDB();
-  await dbUpdate(`rooms/${myRoomCode}/config`, {phase:'bidding'});
-  document.getElementById('btn-open-bids').disabled=true;
-  document.getElementById('btn-open-bids').textContent='Bidding open \u2713';
-  showItab('itab-results');
-  document.getElementById('results-waiting').style.display='none';
-  document.getElementById('results-live').style.display='block';
-  listenBids();
-}
-
-async function listenBids(){
-  await waitForDB();
-  // Listen to students and bids in real time
-  let students={}, bids={}, cfg=null;
-
-  const u1=dbOn(`rooms/${myRoomCode}/config`, c=>{ cfg=c; render(); });
-  const u2=dbOn(`rooms/${myRoomCode}/students`, s=>{ students=s||{}; render(); });
-  const u3=dbOn(`rooms/${myRoomCode}/bids`, b=>{ bids=b||{}; render(); });
-  unsubListeners.push(u1,u2,u3);
-
-  function render(){
-    if(!cfg) return;
-    if(cfg.phase==='results'){
-      Promise.all([
-        dbGet(`rooms/${myRoomCode}/results`),
-        dbGet(`rooms/${myRoomCode}/students`),
-        dbGet(`rooms/${myRoomCode}/bids`)
-      ]).then(([r,s,b])=>{
-        if(r) showFinalResults(cfg,r,s?Object.values(s):[],b||{});
-      });
-      return;
-    }
-    const sArr=Object.values(students);
-    const done=sArr.filter(s=>bids[s.id]).length;
-    const total=sArr.length;
-    const pct=total>0?Math.round(done/total*100):0;
-    document.getElementById('bid-progress-label').textContent=`${done} / ${total} submitted`;
-    document.getElementById('bid-progress-pct').textContent=`${pct}%`;
-    document.getElementById('bid-progress-bar').style.width=pct+'%';
-    let totalBidShares=0;
-    sArr.filter(s=>bids[s.id]).forEach(s=>{totalBidShares+=(bids[s.id].lots||0)*cfg.lot;});
-    const estSharesForBar=cfg.target&&cfg.floor?Math.floor(cfg.target/cfg.floor/cfg.lot)*cfg.lot:1;
-    const subX=totalBidShares/estSharesForBar;
-    const estShares=cfg.target&&cfg.floor?Math.floor(cfg.target/cfg.floor/cfg.lot)*cfg.lot:0;
-    document.getElementById('book-label').textContent=`${fmt(totalBidShares)} shares bid (est. ${fmt(estShares)} shares at floor)`;
-    document.getElementById('book-pct').textContent=`${fmtD(subX,2)}x subscribed`;
-    const bar=document.getElementById('book-bar');
-    bar.style.width=Math.min(subX*100,100)+'%';
-    bar.className='progress-inner'+(subX>1?' over':'');
-    document.getElementById('bid-status-rows').innerHTML=sArr.map(s=>`
-      <div class="student-row">
-        <div class="avatar">${s.name.charAt(0).toUpperCase()}</div>
-        <span style="font-size:14px;flex:1">${s.name}</span>
-        ${bids[s.id]?'<span class="badge b-success">Submitted</span>':'<span class="badge b-muted pulse">Pending\u2026</span>'}
-      </div>`).join('')||'<p style="font-size:13px;color:var(--faint)">No students yet</p>';
-    document.getElementById('btn-close-book').disabled=done===0;
-  }
-}
-
-async function closeBook(){
-  setLoading('btn-close-book',true,'Calculating\u2026');
-  try {
-    // Step 1: read room
-    const roomData=await dbGet(`rooms/${myRoomCode}`);
-    if(!roomData){ alert('Error: Could not read room data. Check Firebase rules.'); setLoading('btn-close-book',false,'Close book & reveal results \u2192'); return; }
-    const cfg=roomData.config;
-    if(!cfg){ alert('Error: No config found in room.'); setLoading('btn-close-book',false,'Close book & reveal results \u2192'); return; }
-    const students=roomData.students?Object.values(roomData.students):[];
-    const bids=roomData.bids||{};
-    closeBookCalc(cfg, students, bids);
-  } catch(e) {
-    alert('Error reading from Firebase: ' + e.message);
-    setLoading('btn-close-book',false,'Close book & reveal results \u2192');
-  }
-}
-
-async function closeBookCalc(cfg, students, bids){
-
-  // --- Book building cut-off logic ---
-  // --- Correct book building allotment logic ---
-  // Company wants to RAISE a target amount \u2014 shares issued = target \u00F7 cut-off price
-  // 1. Sort bids highest to lowest price
-  // 2. Cut-off = lowest price at which total demand (in \u20B9) >= target
-  // 3. Shares issued = target \u00F7 cut-off price
-  // 4. Fill allotments from highest bid down until shares are exhausted
-  // 5. Everyone pays the cut-off price
-
-  const sortedBids=students
-    .filter(s=>bids[s.id]&&bids[s.id].lots>0)
-    .map(s=>({student:s,bid:bids[s.id]}))
-    .sort((a,b)=>b.bid.price-a.bid.price);
-
-  // Step 1: Find cut-off price
-  // Accumulate bids high to low. Cut-off = price where cumulative \u20B9 demand >= target
-  let cumAmount=0;
-  let cutoffPrice=cfg.floor;
-  for(let i=0;i<sortedBids.length;i++){
-    const b=sortedBids[i].bid;
-    cumAmount+=b.lots*cfg.lot*b.price;
-    if(cumAmount>=cfg.target){
-      cutoffPrice=b.price;
-      break;
-    }
-    // If all bids exhausted without meeting target, use lowest bid price as cut-off
-    if(i===sortedBids.length-1) cutoffPrice=b.price;
-  }
-
-  // Step 2: Shares to be issued = target \u00F7 cut-off price (rounded to lot size)
-  const totalShares=Math.floor(cfg.target/cutoffPrice/cfg.lot)*cfg.lot;
-
-  // Step 3: Allot shares from highest bid down, pro-rata within same price group
-  let sharesRemaining=totalShares;
-  const allottedMap={};
-
-  // Group eligible bids by price (highest first)
-  const priceGroups=[];
-  sortedBids.filter(({bid:b})=>b.price>=cutoffPrice).forEach(({student:s,bid:b})=>{
-    const last=priceGroups[priceGroups.length-1];
-    if(last&&last.price===b.price) last.bids.push({s,b});
-    else priceGroups.push({price:b.price,bids:[{s,b}]});
-  });
-
-  for(const group of priceGroups){
-    if(sharesRemaining<=0){ group.bids.forEach(({s})=>allottedMap[s.id]=0); continue; }
-    const groupTotal=group.bids.reduce((sum,{b})=>sum+b.lots*cfg.lot,0);
-    if(groupTotal<=sharesRemaining){
-      // Full allotment for everyone in this price group
-      group.bids.forEach(({s,b})=>{ allottedMap[s.id]=b.lots*cfg.lot; });
-      sharesRemaining-=groupTotal;
+// ============================================================
+// Instructor: lobby polling
+// ============================================================
+var lobbyPollTimer = null;
+function pollLobby() {
+  dbGet('rooms/' + myRoomCode + '/students').then(function(sObj) {
+    var students = sObj ? Object.values(sObj) : [];
+    document.getElementById('lob-count').textContent = students.length;
+    var btn = document.getElementById('btn-open-bids');
+    btn.disabled = students.length === 0;
+    var list = document.getElementById('lobby-list');
+    if (students.length === 0) {
+      list.innerHTML = '<p style="font-size:13px;color:var(--faint)">Waiting for students...</p>';
     } else {
-      // Pro-rata within this price group — everyone gets same fraction
-      const ratio=sharesRemaining/groupTotal;
-      group.bids.forEach(({s,b})=>{
-        const wanted=b.lots*cfg.lot;
-        const prorata=Math.floor(wanted*ratio/cfg.lot)*cfg.lot;
-        allottedMap[s.id]=prorata;
-      });
-      sharesRemaining=0;
+      list.innerHTML = students.map(function(s) {
+        return '<div class="student-row"><div class="avatar">' + s.name[0].toUpperCase() + '</div><span style="font-size:14px">' + s.name + '</span></div>';
+      }).join('');
     }
-  }
-  // Students who bid below cutoff or didn't bid get 0
-  sortedBids.filter(({bid:b})=>b.price<cutoffPrice).forEach(({student:s})=>allottedMap[s.id]=0);
-  students.forEach(s=>{if(allottedMap[s.id]===undefined)allottedMap[s.id]=0;});
-  const eligibleShares=Object.values(allottedMap).reduce((a,v)=>a+v,0);
-  const ratio=totalShares>0?eligibleShares/totalShares:0;
+  });
+  lobbyPollTimer = setTimeout(pollLobby, 3000);
+}
 
-  const allotments={};
-  students.forEach(s=>{
-    const b=bids[s.id];
-    const allottedShares=allottedMap[s.id]||0;
-    const bidPrice=b?b.price:0;
-    const bidShares=b?b.lots*cfg.lot:0;
-    if(!b||!b.lots||allottedShares===0){
-      const isBelowCutoff=b&&b.lots&&bidPrice<cutoffPrice;
-      const unused=cfg.funds;
-      allotments[s.id]={allotted:0,cost:0,refund:0,unused,
-        status:(!b||!b.lots)?'no-bid':isBelowCutoff?'below-cutoff':'no-allot'};
-    } else {
-      const cost=allottedShares*cutoffPrice;
-      const refund=(bidPrice-cutoffPrice)*allottedShares+(bidShares-allottedShares)*bidPrice;
-      const unused=cfg.funds-cost;
-      allotments[s.id]={allotted:allottedShares,cost,refund,unused,
-        status:allottedShares>=bidShares?'full':'partial'};
+// ============================================================
+// Instructor: open bidding
+// ============================================================
+function openBidding() {
+  clearTimeout(lobbyPollTimer);
+  dbUpdate('rooms/' + myRoomCode + '/config', {phase: 'bidding'}).then(function() {
+    document.getElementById('results-waiting').style.display = 'none';
+    document.getElementById('results-live').style.display = 'block';
+    showItab('itab-results');
+    pollBids();
+  });
+}
+
+// ============================================================
+// Instructor: poll bids
+// ============================================================
+var bidPollTimer = null;
+function pollBids() {
+  Promise.all([
+    dbGet('rooms/' + myRoomCode + '/students'),
+    dbGet('rooms/' + myRoomCode + '/bids'),
+    dbGet('rooms/' + myRoomCode + '/config')
+  ]).then(function(vals) {
+    var sObj = vals[0]; var bObj = vals[1]; var cfg = vals[2];
+    if (!sObj) return;
+    var students = Object.values(sObj);
+    var bids = bObj || {};
+    var submitted = students.filter(function(s){ return bids[s.id]; }).length;
+    var total = students.length;
+    var pct = total > 0 ? Math.round(submitted / total * 100) : 0;
+    document.getElementById('bid-progress-label').textContent = submitted + ' / ' + total + ' submitted';
+    document.getElementById('bid-progress-pct').textContent = pct + '%';
+    document.getElementById('bid-progress-bar').style.width = pct + '%';
+    // Student bid status rows
+    var rows = students.map(function(s) {
+      var b = bids[s.id];
+      var badge = b
+        ? '<span class="badge b-success">Submitted</span>'
+        : '<span class="badge b-muted">Pending</span>';
+      return '<div class="student-row"><div class="avatar">' + s.name[0].toUpperCase() + '</div><span style="font-size:14px;flex:1">' + s.name + '</span>' + badge + '</div>';
+    }).join('');
+    document.getElementById('bid-status-rows').innerHTML = rows;
+    // Enable close book when at least one bid
+    document.getElementById('btn-close-book').disabled = submitted === 0;
+  });
+  bidPollTimer = setTimeout(pollBids, 4000);
+}
+
+// ============================================================
+// Instructor: close book
+// ============================================================
+function closeBook() {
+  clearTimeout(bidPollTimer);
+  setLoading('btn-close-book', true, 'Calculating\u2026');
+  Promise.all([
+    dbGet('rooms/' + myRoomCode + '/config'),
+    dbGet('rooms/' + myRoomCode + '/students'),
+    dbGet('rooms/' + myRoomCode + '/bids')
+  ]).then(function(vals) {
+    var cfg = vals[0];
+    var students = vals[1] ? Object.values(vals[1]) : [];
+    var bids = vals[2] || {};
+
+    // Sort bids highest price first
+    var sortedBids = students
+      .filter(function(s){ return bids[s.id] && bids[s.id].lots > 0; })
+      .map(function(s){ return {student: s, bid: bids[s.id]}; })
+      .sort(function(a, b){ return b.bid.price - a.bid.price; });
+
+    // Step 1: Find cut-off price
+    // Accumulate demand high to low until cumulative >= target
+    var cumAmount = 0;
+    var cutoffPrice = cfg.floor;
+    for (var i = 0; i < sortedBids.length; i++) {
+      var b = sortedBids[i].bid;
+      cumAmount += b.lots * cfg.lot * b.price;
+      if (cumAmount >= cfg.target) {
+        cutoffPrice = b.price;
+        break;
+      }
+      if (i === sortedBids.length - 1) cutoffPrice = b.price;
     }
-    allotments[s.id].totalWealth=allotments[s.id].cost+allotments[s.id].unused;
-  });
 
-  // Rank by total wealth
-  const ranked=[...students].sort((a,b)=>allotments[b.id].totalWealth-allotments[a.id].totalWealth);
-  ranked.forEach((s,i)=>{allotments[s.id].rank=i+1;});
+    // Step 2: Shares issued = target / cutoff (rounded down to lot)
+    var totalShares = Math.floor(cfg.target / cutoffPrice / cfg.lot) * cfg.lot;
 
-  // Don't duplicate students/bids in results \u2014 they're already in Firebase
-  // Only store the computed allotment data
-  const results={cutoffPrice,eligibleShares,totalShares,ratio,allotments,
-    ranked:ranked.map(s=>s.id)};
+    // Step 3: Pro-rata allotment within same price group
+    var sharesRemaining = totalShares;
+    var allottedMap = {};
 
-  // Write results
-  try {
-    setLoading('btn-close-book',true,'Saving results\u2026');
-    await Promise.all([
-      dbSet(`rooms/${myRoomCode}/results`, results),
-      dbUpdate(`rooms/${myRoomCode}/config`, {phase:'results'})
-    ]);
-    showFinalResults(cfg, results, students, bids);
-  } catch(err) {
-    alert('Error saving to Firebase: ' + err.message + '\n\nCheck Firebase rules allow writes.');
-    setLoading('btn-close-book', false, 'Close book & reveal results \u2192');
-  }
-} // end closeBookCalc
+    // Group eligible bids by price
+    var priceGroups = [];
+    sortedBids.filter(function(x){ return x.bid.price >= cutoffPrice; }).forEach(function(x) {
+      var last = priceGroups[priceGroups.length - 1];
+      if (last && last.price === x.bid.price) last.members.push(x);
+      else priceGroups.push({price: x.bid.price, members: [x]});
+    });
 
-function renderLeaderboard(cfg,results,students,bids,el){
-  const {allotments,ranked}=results;
-  const sorted=(ranked||[]).map(id=>students.find(s=>s.id===id)).filter(Boolean);
-  students.forEach(s=>{if(!sorted.find(r=>r.id===s.id))sorted.push(s);});
-  const maxW=Math.max(...sorted.map(s=>(allotments[s.id]||{}).totalWealth||0),1);
-  const medals=['\u1F947','\u1F948','\u1F949'];
-  el.innerHTML=sorted.map(s=>{
-    const a=allotments[s.id]||{totalWealth:cfg.funds,cost:0,unused:cfg.funds,status:'no-bid',rank:99};
-    const rank=a.rank||99;
-    const sc=w=>Math.max(Math.round((w/maxW)*180),3);
-    return `<div class="lb-row ${rank<=3?'rank-'+rank:''}">
-      <div class="lb-rank">${rank<=3?medals[rank-1]:rank}</div>
-      <div class="lb-avatar ${rank<=3?'':'lb-avatar-default'}">${s.name.charAt(0).toUpperCase()}</div>
-      <div class="lb-info">
-        <div class="lb-name">${s.name}</div>
-        <div class="lb-detail">${a.status==='full'?'Full allotment':a.status==='partial'?'Partial allotment':a.status==='below-cutoff'?'Bid below cut-off':'No bid'} \u00B7 Bid \u20B9${bids[s.id]?fmtD(bids[s.id].price,0):'\u2014'}</div>
-        <div class="lb-bars">
-          <div class="lb-bar-seg allotment" style="width:${sc(a.cost)}px"></div>
-          <div class="lb-bar-seg unused" style="width:${sc(a.unused)}px"></div>
-          </div>
-      </div>
-      <div class="lb-wealth">
-        <div class="lb-wealth-val">\u20B9${fmt(a.totalWealth)}</div>
-        <div class="lb-wealth-label">Total wealth</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function showFinalResults(cfg,results,students,bids){
-  currentCfg=cfg; currentResults=results; currentStudents=students; currentBids=bids;
-  document.getElementById('results-live').style.display='none';
-  document.getElementById('results-final').style.display='block';
-  const {allotments,ranked,cutoffPrice,eligibleShares,ratio}=results;
-  const cp=cutoffPrice;
-  const subX=results.totalShares>0?eligibleShares/results.totalShares:0;
-
-  const totalShares=results.totalShares||0;
-  const fundsRaised=totalShares*cp;
-  document.getElementById('final-summary').innerHTML=`
-    <div class="metrics" style="margin-bottom:1rem">
-      <div class="metric"><div class="metric-label">Cut-off price</div><div class="metric-val">\u20B9${fmtD(cp,2)}</div><div class="metric-sub">Everyone pays this price</div></div>
-      <div class="metric"><div class="metric-label">Shares issued</div><div class="metric-val">${fmt(totalShares)}</div><div class="metric-sub">Target \u00F7 Cut-off price</div></div>
-      <div class="metric"><div class="metric-label">Funds raised</div><div class="metric-val">\u20B9${fmt(fundsRaised)}</div><div class="metric-sub">Target \u20B9${fmt(cfg.target)}</div></div>
-    </div>
-    <div class="result-box ${subX>=1?'good':'warn'}" style="margin-bottom:1rem">
-      <h3>${subX>=1?`Oversubscribed \u2014 pro-rata allotment at cut-off \u20B9${fmtD(cp,2)}`:`Fully subscribed at cut-off \u20B9${fmtD(cp,2)}`}</h3>
-      <p style="font-size:13px">Company issues ${fmt(totalShares)} shares at \u20B9${fmtD(cp,2)} each, raising \u20B9${fmt(fundsRaised)}. Everyone who bid at or above cut-off pays \u20B9${fmtD(cp,2)} \u2014 excess refunded.</p>
-    </div>`;
-
-  let rows='';
-  students.forEach(s=>{
-    const b=bids[s.id]||{}; const a=allotments[s.id]||{};
-    const badge=a.status==='full'?'<span class="badge b-success">Full allotment</span>':
-      a.status==='partial'?'<span class="badge b-warn">Partial</span>':
-      a.status==='below-cutoff'?'<span class="badge b-danger">Below cut-off</span>':
-      '<span class="badge b-danger">No bid</span>';
-    rows+=`<tr>
-      <td><span class="badge b-accent">#${a.rank||'\u2014'}</span> <strong>${s.name}</strong></td>
-      <td>${b.price?`\u20B9${fmtD(b.price,0)}`:'\u2014'}</td>
-      <td>\u20B9${fmtD(cp,2)}</td>
-      <td>${b.lots?fmt(b.lots*cfg.lot):'\u2014'}</td>
-      <td>${a.allotted?fmt(a.allotted):'0'}</td>
-      <td>\u20B9${fmt(a.cost||0)}</td>
-      <td style="color:var(--success)">+\u20B9${fmt(a.refund||0)}</td>
-      <td>\u20B9${fmt(a.unused??cfg.funds)}</td>
-      <td style="<td style="font-weight:600;color:var(--accent)">\u20B9${fmt(a.totalWealth||0)}</td>
-      <td>${badge}</td>
-    </tr>`;
-  });
-  document.getElementById('final-table').innerHTML=`
-    <div class="card"><h3 style="margin-bottom:12px">Allotment summary</h3>
-      <div class="table-wrap"><table>
-        <thead><tr><th>Rank \u00B7 Student</th><th>Bid price</th><th>Cut-off price</th><th>Bid shares</th><th>Allotted</th><th>Amount paid</th><th>Refund</th><th>Unused cash</th><th>Total wealth</th><th>Status</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table></div>
-    </div>`;
-
-  const winnerName=(ranked&&ranked[0]&&students)?(students.find(s=>s.id===ranked[0])||{}).name||'\u2014':'\u2014';
-  document.getElementById('leaderboard-waiting').style.display='none';
-  document.getElementById('leaderboard-content').style.display='block';
-  document.getElementById('lb-header').innerHTML=`
-    <div class="metrics">
-      <div class="metric"><div class="metric-label">\u1F3C6 Winner</div><div class="metric-val" style="font-size:16px">${winnerName}</div></div>
-      <div class="metric"><div class="metric-label">Cut-off price</div><div class="metric-val" style="font-size:16px">\u20B9${fmtD(cp,2)}</div></div>
-      <div class="metric"><div class="metric-label">Starting funds</div><div class="metric-val" style="font-size:16px">\u20B9${fmt(cfg.funds)}</div></div>
-    </div>`;
-  renderLeaderboard(cfg,results,students,bids,document.getElementById('lb-rows'));
-
-  const winner=(students||[]).find(s=>(allotments[s.id]||{}).rank===1);
-  const loser=(students||[]).find(s=>(allotments[s.id]||{}).rank===students.length);
-  let debrief=`<p style="margin-bottom:8px">The cut-off price was <strong>\u20B9${fmtD(cp,2)}</strong> \u2014 the price at which cumulative demand met the company's fundraise target of \u20B9${fmt(cfg.target)}. <strong>Everyone who qualified paid \u20B9${fmtD(cp,2)}</strong>, not their individual bid price.</p>`;
-  if(winner) debrief+=`<p style="margin-bottom:8px"><strong>${winner.name}</strong> ranked #1${bids[winner.id]?` with a bid of \u20B9${fmtD(bids[winner.id].price,0)}.`:'.'}`;
-  if(loser&&loser.id!==winner?.id){
-    const lb=bids[loser.id];
-    debrief+=` <strong>${loser.name}</strong> ranked last`;
-    if(lb&&lb.price<cp) debrief+=` \u2014 bid of \u20B9${fmtD(lb.price,0)} was below cut-off, so no allotment.`;
-    else if(!lb||!lb.lots) debrief+=` \u2014 no bid was placed.`;
-  }
-  debrief+=`</p><p><strong>Key insight:</strong> Since everyone pays the cut-off price, bidding above it costs you nothing extra \u2014 you get refunded the difference. The only risk of bidding high is if you bid more lots than you can afford at cut-off. The real strategy is bidding enough lots at or above the cut-off to maximise allotment.</p>`;
-  document.getElementById('lb-debrief').innerHTML=debrief;
-}
-
-async function endGame(){
-  if(!confirm('End the game and clear all room data?'))return;
-  await dbRemove(`rooms/${myRoomCode}`);
-  unsubListeners.forEach(fn=>typeof fn==='function'&&fn());
-  unsubListeners=[];
-  myRoomCode='';
-  document.getElementById('hpill-room').style.display='none';
-  document.getElementById('hpill-role').textContent='Simulation';
-  showScreen('screen-landing'); showItab('itab-setup');
-}
-
-// --- student ---
-async function joinGame(){
-  await waitForDB();
-  const name=document.getElementById('join-name').value.trim();
-  const code=document.getElementById('join-code').value.trim().toUpperCase();
-  const err=document.getElementById('join-error'); err.style.display='none';
-  if(!name){err.textContent='Please enter your name.';err.style.display='block';return;}
-  if(!code||code.length<3){err.textContent='Please enter a valid room code.';err.style.display='block';return;}
-  setLoading('btn-join',true,'Joining\u2026');
-
-  const cfg=await dbGet(`rooms/${code}/config`);
-  if(!cfg){
-    setLoading('btn-join',false,'Join game \u2192');
-    err.style.display='block'; return;
-  }
-
-  myRoomCode=code; sConfig=cfg;
-  myStudentId='S'+Date.now().toString(36)+Math.random().toString(36).substr(2,3);
-
-  // Write student record instantly \u2014 Firebase is real-time, no delay
-  await dbSet(`rooms/${code}/students/${myStudentId}`, {id:myStudentId, name, joinedAt:Date.now()});
-
-  setLoading('btn-join',false,'Join game \u2192');
-  document.getElementById('hpill-role').textContent='Student';
-  document.getElementById('hpill-room').textContent=`Room: ${code}`;
-  document.getElementById('hpill-room').style.display='';
-  document.getElementById('student-name-display').textContent=`Joined as ${name} \u00B7 Room ${code}`;
-  showScreen('screen-student');
-  listenStudentPhase();
-}
-
-function updateBidCalc(){
-  const price=parseFloat(document.getElementById('s-price').value)||0;
-  const lots=parseInt(document.getElementById('s-lots').value)||0;
-  const lotHint=document.getElementById('s-lots-hint').textContent;
-  const lotMatch=lotHint.match(/1 lot = ([\d,]+)/);
-  const lotSize=lotMatch?parseInt(lotMatch[1].replace(/,/g,'')):100;
-  const fundsEl=document.getElementById('s-funds');
-  const fundsText=fundsEl?fundsEl.textContent.replace(/[^\d]/g,''):'0';
-  const funds=parseInt(fundsText)||0;
-  const shares=lots*lotSize;
-  const cost=shares*price;
-  const rem=funds-cost;
-  document.getElementById('bc-shares').textContent=fmt(shares);
-  document.getElementById('bc-cost').textContent='₹'+fmt(cost);
-  document.getElementById('bc-rem').textContent=rem>=0?'₹'+fmt(rem):'⚠️ Over budget';
-  document.getElementById('bc-rem').style.color=rem<0?'var(--danger)':'var(--success)';
-  const be=document.getElementById('bid-error');
-  if(rem<0){be.textContent='Bid exceeds your available funds.';be.style.display='block';}
-  else be.style.display='none';
-}
-
-function showBiddingUI(cfg){
-  if(document.getElementById('student-bidding').style.display==='block') return;
-  document.getElementById('student-waiting').style.display='none';
-  document.getElementById('student-submitted').style.display='none';
-  document.getElementById('student-bidding').style.display='block';
-  document.getElementById('s-company').textContent=cfg.company||'--';
-  document.getElementById('s-band').textContent='₹'+fmt(cfg.floor)+' – ₹'+fmt(cfg.cap);
-  document.getElementById('s-funds').textContent='₹'+fmt(cfg.funds);
-  const pe=document.getElementById('s-price');
-  if(!pe.dataset.init){pe.min=cfg.floor;pe.max=cfg.cap;pe.value=cfg.floor;pe.dataset.init='1';}
-  document.getElementById('s-price-hint').textContent='Between ₹'+fmt(cfg.floor)+' and ₹'+fmt(cfg.cap);
-  document.getElementById('s-lots-hint').textContent='1 lot = '+fmt(cfg.lot)+' shares · Max '+Math.floor(cfg.funds/(cfg.lot*cfg.floor))+' lots at floor price';
-  updateBidCalc();
-}
-
-async function listenStudentPhase(){
-  await waitForDB();
-  let _resultShown = false;
-  async function poll(){
-    if(_resultShown) return;
-    try {
-      const cfg = await dbGet(`rooms/${myRoomCode}/config`);
-      if(!cfg){ setTimeout(poll, 4000); return; }
-      sConfig = cfg;
-
-      if(cfg.phase === 'results'){
-        if(_resultShown) return;
-        document.getElementById('student-waiting').style.display='block';
-        document.getElementById('student-submitted').style.display='none';
-        document.getElementById('student-waiting').querySelector('h2').textContent='Results ready! Loading…';
-        const [results, sObj, bObj] = await Promise.all([
-          dbGet(`rooms/${myRoomCode}/results`),
-          dbGet(`rooms/${myRoomCode}/students`),
-          dbGet(`rooms/${myRoomCode}/bids`)
-        ]);
-        if(!results){ setTimeout(poll, 2000); return; }
-        const al=(results.allotments||{})[myStudentId];
-        const b=bObj?bObj[myStudentId]:null;
-        const students=sObj?Object.values(sObj):[];
-        const bids=bObj||{};
-        document.getElementById('student-waiting').style.display='none';
-        _resultShown = true;
-        if(al){
-          showStudentResult(cfg,results,al,b,students,bids);
-        } else {
-          const dummyAl={allotted:0,cost:0,refund:0,unused:cfg.funds,
-            status:'no-bid',rank:students.length,totalWealth:cfg.funds};
-          showStudentResult(cfg,results,dummyAl,null,students,bids);
-        }
+    priceGroups.forEach(function(group) {
+      if (sharesRemaining <= 0) {
+        group.members.forEach(function(x){ allottedMap[x.student.id] = 0; });
         return;
       }
-
-      if(cfg.phase === 'bidding'){
-        document.getElementById('student-waiting').style.display='none';
-        const submitted = await dbGet(`rooms/${myRoomCode}/bids/${myStudentId}`);
-        if(submitted){
-          document.getElementById('student-bidding').style.display='none';
-          document.getElementById('student-submitted').style.display='block';
-        } else {
-          showBiddingUI(cfg);
-        }
+      var groupTotal = group.members.reduce(function(sum, x){ return sum + x.bid.lots * cfg.lot; }, 0);
+      if (groupTotal <= sharesRemaining) {
+        // Full allotment for everyone in this group
+        group.members.forEach(function(x){ allottedMap[x.student.id] = x.bid.lots * cfg.lot; });
+        sharesRemaining -= groupTotal;
+      } else {
+        // Pro-rata: everyone gets same fraction of their bid
+        var ratio = sharesRemaining / groupTotal;
+        group.members.forEach(function(x) {
+          var wanted = x.bid.lots * cfg.lot;
+          allottedMap[x.student.id] = Math.floor(wanted * ratio / cfg.lot) * cfg.lot;
+        });
+        sharesRemaining = 0;
       }
-    } catch(e){ console.error('poll error', e); }
-    setTimeout(poll, 4000);
-  }
-  poll();
+    });
+
+    // Students who bid below cutoff or didn't bid
+    students.forEach(function(s){
+      if (allottedMap[s.id] === undefined) allottedMap[s.id] = 0;
+    });
+
+    var eligibleShares = Object.values(allottedMap).reduce(function(a, v){ return a + v; }, 0);
+
+    // Step 4: Build allotments object
+    var allotments = {};
+    students.forEach(function(s) {
+      var b = bids[s.id];
+      var allottedShares = allottedMap[s.id] || 0;
+      var bidPrice = b ? b.price : 0;
+      var bidShares = b ? b.lots * cfg.lot : 0;
+
+      if (!b || !b.lots) {
+        allotments[s.id] = {allotted: 0, cost: 0, refund: 0, unused: cfg.funds, status: 'no-bid', totalWealth: cfg.funds};
+      } else if (bidPrice < cutoffPrice) {
+        allotments[s.id] = {allotted: 0, cost: 0, refund: 0, unused: cfg.funds, status: 'below-cutoff', totalWealth: cfg.funds};
+      } else {
+        var cost = allottedShares * cutoffPrice;
+        var refund = (bidPrice - cutoffPrice) * allottedShares + (bidShares - allottedShares) * bidPrice;
+        var unused = cfg.funds - cost;
+        var status = allottedShares >= bidShares ? 'full' : allottedShares > 0 ? 'partial' : 'no-allot';
+        allotments[s.id] = {allotted: allottedShares, cost: cost, refund: refund, unused: unused, status: status, totalWealth: cost + unused};
+      }
+    });
+
+    // Step 5: Rank by totalWealth
+    var ranked = students.slice().sort(function(a, b){
+      return (allotments[b.id] || {}).totalWealth - (allotments[a.id] || {}).totalWealth;
+    });
+    ranked.forEach(function(s, i){ if (allotments[s.id]) allotments[s.id].rank = i + 1; });
+
+    var results = {
+      cutoffPrice: cutoffPrice,
+      totalShares: totalShares,
+      eligibleShares: eligibleShares,
+      allotments: allotments,
+      ranked: ranked.map(function(s){ return s.id; })
+    };
+
+    setLoading('btn-close-book', true, 'Saving results\u2026');
+    Promise.all([
+      dbSet('rooms/' + myRoomCode + '/results', results),
+      dbUpdate('rooms/' + myRoomCode + '/config', {phase: 'results'})
+    ]).then(function() {
+      setLoading('btn-close-book', false, 'Close book &amp; reveal results &rarr;');
+      showFinalResults(cfg, results, students, bids);
+    }).catch(function(e) {
+      alert('Error saving results: ' + e.message);
+      setLoading('btn-close-book', false, 'Close book &amp; reveal results &rarr;');
+    });
+  }).catch(function(e) {
+    alert('Error reading data: ' + e.message);
+    setLoading('btn-close-book', false, 'Close book &amp; reveal results &rarr;');
+  });
 }
 
+// ============================================================
+// Instructor: show final results
+// ============================================================
+function showFinalResults(cfg, results, students, bids) {
+  currentCfg = cfg;
+  currentResults = results;
+  currentStudents = students;
+  currentBids = bids;
 
-async function submitBid(){
-  const cfg=sConfig; if(!cfg)return;
-  const price=parseFloat(document.getElementById('s-price').value);
-  const lots=parseInt(document.getElementById('s-lots').value)||0;
-  const cost=lots*cfg.lot*price;
-  const be=document.getElementById('bid-error');
-  if(!price||price<cfg.floor||price>cfg.cap){be.textContent=`Price must be between \u20B9${fmt(cfg.floor)} and \u20B9${fmt(cfg.cap)}.`;be.style.display='block';return;}
-  if(cost>cfg.funds){be.textContent='Bid exceeds your funds.';be.style.display='block';return;}
-  if(lots===0){be.textContent='Please enter at least 1 lot.';be.style.display='block';return;}
-  setLoading('btn-submit-bid',true,'Submitting\u2026');
-  await dbSet(`rooms/${myRoomCode}/bids/${myStudentId}`, {id:myStudentId, price, lots, submittedAt:Date.now()});
-  setLoading('btn-submit-bid',false,'Submit bid \u2192');
-  document.getElementById('student-bidding').style.display='none';
-  document.getElementById('student-submitted').style.display='block';
-  document.getElementById('submitted-summary').innerHTML=`
-    <table style="min-width:unset;font-size:13px">
-      <tr><td style="color:var(--muted);padding:4px 0;border:none">Bid price</td><td style="padding:4px 12px;border:none;font-weight:600">\u20B9${fmtD(price,2)}</td></tr>
-      <tr><td style="color:var(--muted);padding:4px 0;border:none">Lots</td><td style="padding:4px 12px;border:none;font-weight:600">${lots} (${fmt(lots*cfg.lot)} shares)</td></tr>
-      <tr><td style="color:var(--muted);padding:4px 0;border:none">Total bid amount</td><td style="padding:4px 12px;border:none;font-weight:600">\u20B9${fmt(cost)}</td></tr>
-      <tr><td style="color:var(--muted);padding:4px 0;border:none">Note</td><td style="padding:4px 12px;border:none;font-size:12px;color:var(--muted)">You will pay the cut-off price, not your bid price</td></tr>
-    </table>`;
+  var cp = results.cutoffPrice;
+  var ts = results.totalShares || 0;
+  var al = results.allotments || {};
+
+  document.getElementById('results-live').style.display = 'none';
+  document.getElementById('results-final').style.display = 'block';
+
+  // Summary
+  document.getElementById('final-summary').innerHTML =
+    '<div class="metrics" style="margin-bottom:1rem">' +
+    '<div class="metric"><div class="metric-label">Cut-off price</div><div class="metric-val">\u20B9' + fmtD(cp, 2) + '</div></div>' +
+    '<div class="metric"><div class="metric-label">Shares issued</div><div class="metric-val">' + fmt(ts) + '</div><div class="metric-sub">Target \u00F7 cut-off</div></div>' +
+    '<div class="metric"><div class="metric-label">Funds raised</div><div class="metric-val" style="font-size:16px">\u20B9' + fmt(cp * ts) + '</div></div>' +
+    '</div>';
+
+  // Table
+  var trows = students.slice().sort(function(a, b){ return (al[a.id]||{}).rank - (al[b.id]||{}).rank; }).map(function(s) {
+    var a = al[s.id] || {};
+    var b = bids[s.id] || {};
+    var statusBadge = a.status === 'full' ? '<span class="badge b-success">Full</span>' :
+      a.status === 'partial' ? '<span class="badge b-warn">Partial</span>' :
+      a.status === 'below-cutoff' ? '<span class="badge b-danger">Below cut-off</span>' :
+      '<span class="badge b-muted">No bid</span>';
+    return '<tr><td><strong>' + (a.rank || '--') + '</strong></td><td>' + s.name + '</td>' +
+      '<td>\u20B9' + fmtD(b.price || 0, 2) + '</td>' +
+      '<td>' + fmt(a.allotted || 0) + '</td>' +
+      '<td>\u20B9' + fmt(a.cost || 0) + '</td>' +
+      '<td>\u20B9' + fmt(a.refund || 0) + '</td>' +
+      '<td>\u20B9' + fmt(a.unused != null ? a.unused : cfg.funds) + '</td>' +
+      '<td style="font-weight:600">\u20B9' + fmt(a.totalWealth || 0) + '</td>' +
+      '<td>' + statusBadge + '</td></tr>';
+  }).join('');
+
+  document.getElementById('final-table').innerHTML =
+    '<div class="table-wrap"><table><thead><tr>' +
+    '<th>Rank</th><th>Student</th><th>Bid price</th><th>Allotted</th>' +
+    '<th>Amount paid</th><th>Refund</th><th>Unused cash</th><th>Total wealth</th><th>Status</th>' +
+    '</tr></thead><tbody>' + trows + '</tbody></table></div>';
+
+  showItab('itab-results');
+  renderLeaderboard(cfg, results, students, bids, document.getElementById('lb-rows'));
+  document.getElementById('leaderboard-waiting').style.display = 'none';
+  document.getElementById('leaderboard-content').style.display = 'block';
 }
 
-function showStudentResult(cfg,results,al,b,students,bids){
-  _studentResultShown = true;
-  document.getElementById('student-waiting').style.display='none';
-  document.getElementById('student-bidding').style.display='none';
-  document.getElementById('student-submitted').style.display='none';
-  document.getElementById('student-result').style.display='block';
-  const cp=results.cutoffPrice;
-  const box=al.status==='full'?'good':al.status==='partial'?'warn':'bad';
-  const msg=al.status==='full'?'Full allotment \u2014 congratulations!':
-    al.status==='partial'?'Partial allotment \u2014 IPO oversubscribed, shares allotted pro-rata':
-    al.status==='below-cutoff'?`Your bid (\u20B9${b?.price}) was below the cut-off (\u20B9${fmtD(cp,2)}) \u2014 no allotment`:
-    'No bid placed \u2014 no allotment';
-  const medals=['\u1F947','\u1F948','\u1F949'];
-  const rd=al.rank&&al.rank<=3?medals[al.rank-1]:`#${al.rank}`;
-  document.getElementById('student-result-content').innerHTML=`
-    <div class="result-box ${box}"><h3>${msg}</h3></div>
-    ${al.rank?`<div style="text-align:center;margin-bottom:1.5rem">
-      <div class="lb-student-pos">${rd}</div>
-      <div class="lb-student-subtitle">Ranked <strong>#${al.rank}</strong> of ${results.students.length} \u00B7 Total wealth: <strong>\u20B9${fmt(al.totalWealth||0)}</strong></div>
-    </div>`:''}
-    <div class="metrics" style="margin-bottom:1rem">
-      <div class="metric"><div class="metric-label">Your bid price</div><div class="metric-val">${b?`\u20B9${fmtD(b.price,2)}`:'\u2014'}</div></div>
-      <div class="metric"><div class="metric-label">Cut-off price</div><div class="metric-val" style="color:var(--accent)">\u20B9${fmtD(cp,2)}</div></div>
-      <div class="metric"><div class="metric-label">Your rank</div><div class="metric-val">#${al.rank||'\u2014'}</div></div>
-      <div class="metric"><div class="metric-label">Shares allotted</div><div class="metric-val">${fmt(al.allotted||0)}</div></div>
-      <div class="metric"><div class="metric-label">Amount paid</div><div class="metric-val">\u20B9${fmt(al.cost||0)}</div></div>
-      <div class="metric"><div class="metric-label">Refund received</div><div class="metric-val" style="color:var(--success)">+\u20B9${fmt(al.refund||0)}</div></div>
-      <div class="metric"><div class="metric-label">Unused cash</div><div class="metric-val">\u20B9${fmt(al.unused??cfg.funds)}</div></div>
-      <div style="display:none"><div class="metric-label">Interest earned</div><div class="metric-val" style="</div>
-      <div class="metric"><div class="metric-label">Total wealth</div><div class="metric-val" style="color:var(--accent)">\u20B9${fmt(al.totalWealth||0)}</div></div>
-    </div>
-    <div class="card" style="background:var(--accent-bg);border-color:var(--accent-border)">
-      <h3 style="color:var(--accent);margin-bottom:8px">What happened</h3>
-      <p style="font-size:13px">The cut-off price (\u20B9${fmtD(cp,2)}) is where cumulative demand met the company's fundraise target. ${b&&b.price>=cp?`Your bid of \u20B9${b.price} was at or above cut-off \u2014 you qualified for allotment. You paid \u20B9${fmtD(cp,2)} per share (not your bid price) and received \u20B9${fmt(al.refund||0)} as refund.`:`Your bid of \u20B9${b?.price||'\u2014'} was below the cut-off \u2014 no allotment, all funds returned.`}</p>
-    </div>`;
-  document.getElementById('student-leaderboard-section').style.display='block';
-  renderLeaderboard(cfg,results,students,bids,document.getElementById('student-lb-rows'));
-}
-// --- Market price & CSV ---
-let currentResults = null;
-let _studentResultShown = false;
-let currentCfg = null;
-let currentStudents = null;
-let currentBids = null;
-let appliedMarketPrice = null;
-
+// ============================================================
+// Instructor: apply market price
+// ============================================================
 function applyMarketPrice() {
-  const mp = parseFloat(document.getElementById('market-price').value);
-  if (!mp || mp <= 0) { alert('Please enter a valid market price.'); return; }
-  if (!currentResults || !currentStudents) { alert('Close the book first to generate results.'); return; }
+  var mp = parseFloat(document.getElementById('market-price').value);
+  if (!mp || mp <= 0) { alert('Enter a valid market price.'); return; }
+  if (!currentResults || !currentStudents) { alert('Close the book first.'); return; }
   appliedMarketPrice = mp;
+  var al = currentResults.allotments;
+  var cfg = currentCfg;
 
-  // Recalculate wealth using market price
-  const al = currentResults.allotments || {};
-  const cfg = currentCfg;
-  currentStudents.forEach(s => {
-    const a = al[s.id];
+  // Recalculate wealth
+  currentStudents.forEach(function(s) {
+    var a = al[s.id];
     if (!a) return;
-    const sharesValue = (a.allotted || 0) * mp;
-    const unusedCash = a.unused || cfg.funds;
-    a.totalWealth = sharesValue + unusedCash;
-    a.marketValue = sharesValue;
-    a.marketPrice = mp;
+    var mv = (a.allotted || 0) * mp;
+    var uc = a.unused != null ? a.unused : cfg.funds;
+    a.totalWealth = mv + uc;
+    a.marketValue = mv;
   });
 
   // Re-rank
-  const ranked = [...currentStudents].sort((a,b) =>
-    (al[b.id]||{}).totalWealth - (al[a.id]||{}).totalWealth
-  );
-  ranked.forEach((s,i) => { if(al[s.id]) al[s.id].rank = i+1; });
-  currentResults.ranked = ranked.map(s=>s.id);
+  var ranked = currentStudents.slice().sort(function(a, b){
+    return al[b.id].totalWealth - al[a.id].totalWealth;
+  });
+  ranked.forEach(function(s, i){ al[s.id].rank = i + 1; });
+  currentResults.ranked = ranked.map(function(s){ return s.id; });
   currentResults.marketPrice = mp;
 
-  // Update leaderboard
   renderLeaderboard(currentCfg, currentResults, currentStudents, currentBids, document.getElementById('lb-rows'));
+  document.getElementById('leaderboard-waiting').style.display = 'none';
+  document.getElementById('leaderboard-content').style.display = 'block';
 
-  // Update lb-header
-  const winnerName = (currentResults.ranked && currentResults.ranked[0])
-    ? (currentStudents.find(s=>s.id===currentResults.ranked[0])||{}).name||'--' : '--';
-  document.getElementById('lb-header').innerHTML = `
-    <div class="metrics">
-      <div class="metric"><div class="metric-label">&#x1F3C6; Winner</div><div class="metric-val" style="font-size:16px">${winnerName}</div></div>
-      <div class="metric"><div class="metric-label">Cut-off price</div><div class="metric-val" style="font-size:16px">₹${fmtD(currentResults.cutoffPrice,2)}</div></div>
-      <div class="metric"><div class="metric-label">Market price</div><div class="metric-val" style="font-size:16px;color:var(--success)">₹${fmtD(mp,2)}</div></div>
-    </div>
-    <div class="card" style="background:var(--success-bg);border-color:var(--success-border);margin-bottom:0">
-      <p style="font-size:13px">Wealth updated using market price ₹${fmtD(mp,2)}.
-      ${mp > currentResults.cutoffPrice
-        ? `Stock is trading <strong>above cut-off</strong> — allotted students made a gain of ₹${fmtD(mp - currentResults.cutoffPrice,2)} per share.`
-        : mp < currentResults.cutoffPrice
-        ? `Stock is trading <strong>below cut-off</strong> — allotted students are at a loss of ₹${fmtD(currentResults.cutoffPrice - mp,2)} per share.`
-        : 'Stock is trading at the cut-off price.'
-      }</p>
-    </div>`;
+  var cp = currentResults.cutoffPrice;
+  var gain = mp > cp ? '<span style="color:var(--success)">\u2B06 \u20B9' + fmtD(mp - cp, 2) + ' gain per share vs cut-off</span>' :
+    mp < cp ? '<span style="color:var(--danger)">\u2B07 \u20B9' + fmtD(cp - mp, 2) + ' loss per share vs cut-off</span>' :
+    'Trading at cut-off price';
+  document.getElementById('lb-header').innerHTML =
+    '<div class="card" style="background:var(--success-bg);border-color:var(--success-border)">' +
+    '<p style="font-size:13px">Market price set to <strong>\u20B9' + fmtD(mp, 2) + '</strong>. ' + gain + '. Wealth = allotted shares \u00D7 market price + unused cash.</p></div>';
 
   showItab('itab-leaderboard');
 }
 
+// ============================================================
+// Leaderboard renderer
+// ============================================================
+function renderLeaderboard(cfg, results, students, bids, el) {
+  if (!el) return;
+  var al = results.allotments || {};
+  var ranked = (results.ranked || []).map(function(id){ return students.find(function(s){ return s.id === id; }); }).filter(Boolean);
+  // Add students not in ranked
+  students.forEach(function(s){ if (ranked.indexOf(s) === -1) ranked.push(s); });
+
+  el.innerHTML = ranked.map(function(s, i) {
+    var a = al[s.id] || {};
+    var rank = a.rank || i + 1;
+    var medal = rank === 1 ? '\U0001F947' : rank === 2 ? '\U0001F948' : rank === 3 ? '\U0001F949' : rank;
+    var cls = rank <= 3 ? ' rank-' + rank : '';
+    var mp = results.marketPrice;
+    var wealth = a.totalWealth || 0;
+    var detail = mp
+      ? ('\u20B9' + fmt((a.allotted||0)*mp) + ' market value + \u20B9' + fmt(a.unused!=null?a.unused:cfg.funds) + ' cash')
+      : ('\u20B9' + fmt(a.cost||0) + ' invested + \u20B9' + fmt(a.unused!=null?a.unused:cfg.funds) + ' cash');
+    return '<div class="lb-row' + cls + '">' +
+      '<div class="lb-rank">' + medal + '</div>' +
+      '<div style="flex:1"><div class="lb-name">' + s.name + '</div>' +
+      '<div class="lb-detail">' + detail + '</div></div>' +
+      '<div style="text-align:right"><div class="lb-wealth">\u20B9' + fmt(wealth) + '</div>' +
+      '<div class="lb-sub">Total wealth</div></div></div>';
+  }).join('');
+}
+
+// ============================================================
+// Download CSV
+// ============================================================
 function downloadCSV() {
-  if (!currentResults || !currentStudents) { alert('No results yet. Close the book first.'); return; }
-  const al = currentResults.allotments || {};
-  const bids = currentBids || {};
-  const cfg = currentCfg;
-  const mp = appliedMarketPrice;
-  const cp = currentResults.cutoffPrice;
-  const ts = currentResults.totalShares || 0;
-
-  const rows = [
+  if (!currentResults || !currentStudents) { alert('No results yet.'); return; }
+  var cfg = currentCfg;
+  var al = currentResults.allotments || {};
+  var bids = currentBids || {};
+  var mp = appliedMarketPrice;
+  var cp = currentResults.cutoffPrice;
+  var rows = [
     ['IPO Book Building Results'],
-    ['Company', cfg.company],
-    ['Fund raise target', cfg.target],
-    ['Cut-off price', cp],
-    ['Shares issued', ts],
-    ['Market price', mp || 'Not set'],
+    ['Company', cfg.company, 'Cut-off price', cp, 'Market price', mp || 'Not set', 'Shares issued', currentResults.totalShares || ''],
     [],
-    ['Student','Bid price','Bid lots','Bid shares','Allotted shares','Amount paid (at cut-off)','Refund','Unused cash', mp?'Market value of shares':'','Total wealth','Status','Rank']
+    ['Rank', 'Student', 'Bid price', 'Bid lots', 'Bid shares', 'Allotted shares', 'Amount paid (cut-off)', 'Refund', 'Unused cash', mp ? 'Market value' : '', 'Total wealth', 'Status']
   ];
-
-  currentStudents.forEach(s => {
-    const b = bids[s.id] || {};
-    const a = al[s.id] || {};
-    const status = a.status==='full' ? 'Full allotment'
-      : a.status==='partial' ? 'Partial allotment'
-      : a.status==='below-cutoff' ? 'Below cut-off'
-      : 'No bid';
+  currentStudents.slice().sort(function(a, b){ return (al[a.id]||{}).rank - (al[b.id]||{}).rank; }).forEach(function(s) {
+    var b = bids[s.id] || {};
+    var a = al[s.id] || {};
+    var uc = a.unused != null ? a.unused : cfg.funds;
+    var mv = mp ? (a.allotted || 0) * mp : '';
     rows.push([
-      s.name,
-      b.price || '',
-      b.lots || '',
-      b.lots ? b.lots * cfg.lot : '',
-      a.allotted || 0,
-      a.cost || 0,
-      a.refund || 0,
-      a.unused != null ? a.unused : cfg.funds,
-      mp ? (a.allotted||0)*mp : '',
-      a.totalWealth||0,
-      status,
-      a.rank || ''
+      a.rank || '', s.name, b.price || '', b.lots || '', b.lots ? b.lots * cfg.lot : '',
+      a.allotted || 0, a.cost || 0, a.refund || 0, uc, mv,
+      a.totalWealth || uc, a.status || 'no-bid'
     ]);
   });
-
-  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob = new Blob([csv], {type:'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `IPO_Results_${cfg.company}_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
+  var csv = rows.map(function(r){ return r.map(function(v){ return '"' + String(v).replace(/"/g, '""') + '"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv], {type: 'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'IPO_' + cfg.company + '_results.csv'; a.click();
   URL.revokeObjectURL(url);
 }
 
+// ============================================================
+// End game
+// ============================================================
+function endGame() {
+  if (!confirm('End the game? This will clear all data.')) return;
+  dbRemove('rooms/' + myRoomCode).then(function() {
+    myRoomCode = '';
+    document.getElementById('hpill-room').style.display = 'none';
+    showScreen('screen-landing');
+    showItab('itab-setup');
+  });
+}
+
+// ============================================================
+// Student: join
+// ============================================================
+function joinGame() {
+  var name = document.getElementById('join-name').value.trim();
+  var code = document.getElementById('join-code').value.trim().toUpperCase();
+  if (!name) { alert('Please enter your name.'); return; }
+  if (code.length !== 4) { alert('Please enter the 4-character room code.'); return; }
+  setLoading('btn-join', true, 'Joining\u2026');
+  dbGet('rooms/' + code + '/config').then(function(cfg) {
+    if (!cfg) {
+      document.getElementById('join-error').style.display = 'block';
+      setLoading('btn-join', false, 'Join game &rarr;');
+      return;
+    }
+    myRoomCode = code;
+    myStudentName = name;
+    myStudentId = 'stu_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+    return dbSet('rooms/' + code + '/students/' + myStudentId, {id: myStudentId, name: name, joinedAt: Date.now()}).then(function() {
+      setLoading('btn-join', false, 'Join game &rarr;');
+      document.getElementById('student-name-display').textContent = 'Joined as ' + name;
+      document.getElementById('hpill-role').textContent = 'Student';
+      document.getElementById('hpill-room').textContent = 'Room: ' + code;
+      document.getElementById('hpill-room').style.display = '';
+      showScreen('screen-student');
+      sConfig = cfg;
+      _resultShown = false;
+      if (cfg.phase === 'bidding') {
+        showBiddingUI(cfg);
+      } else if (cfg.phase === 'results') {
+        listenStudentPhase();
+      } else {
+        listenStudentPhase();
+      }
+    });
+  }).catch(function(e) {
+    alert('Error: ' + e.message);
+    setLoading('btn-join', false, 'Join game &rarr;');
+  });
+}
+
+// ============================================================
+// Student: bid calculator
+// ============================================================
+function updateBidCalc() {
+  var price = parseFloat(document.getElementById('s-price').value) || 0;
+  var lots = parseInt(document.getElementById('s-lots').value) || 0;
+  var cfg = sConfig;
+  if (!cfg) return;
+  var shares = lots * cfg.lot;
+  var cost = shares * price;
+  var rem = cfg.funds - cost;
+  document.getElementById('bc-shares').textContent = fmt(shares);
+  document.getElementById('bc-cost').textContent = '\u20B9' + fmt(cost);
+  document.getElementById('bc-rem').textContent = '\u20B9' + fmt(rem);
+  document.getElementById('bc-rem').style.color = rem < 0 ? 'var(--danger)' : 'var(--success)';
+  var be = document.getElementById('bid-error');
+  if (rem < 0) { be.textContent = 'Bid exceeds your available funds.'; be.style.display = 'block'; }
+  else be.style.display = 'none';
+}
+
+// ============================================================
+// Student: show bidding UI
+// ============================================================
+function showBiddingUI(cfg) {
+  if (document.getElementById('student-bidding').style.display === 'block') return;
+  sConfig = cfg;
+  document.getElementById('student-waiting').style.display = 'none';
+  document.getElementById('student-submitted').style.display = 'none';
+  document.getElementById('student-bidding').style.display = 'block';
+  document.getElementById('s-company').textContent = cfg.company || '--';
+  document.getElementById('s-band').textContent = '\u20B9' + fmt(cfg.floor) + ' \u2013 \u20B9' + fmt(cfg.cap);
+  document.getElementById('s-funds').textContent = '\u20B9' + fmt(cfg.funds);
+  var pe = document.getElementById('s-price');
+  pe.min = cfg.floor; pe.max = cfg.cap; pe.value = cfg.floor;
+  document.getElementById('s-lots').value = 1;
+  document.getElementById('s-price-hint').textContent = 'Between \u20B9' + fmt(cfg.floor) + ' and \u20B9' + fmt(cfg.cap);
+  document.getElementById('s-lots-hint').textContent = '1 lot = ' + fmt(cfg.lot) + ' shares \u00B7 Max ' + Math.floor(cfg.funds / (cfg.lot * cfg.floor)) + ' lots at floor price';
+  updateBidCalc();
+}
+
+// ============================================================
+// Student: submit bid
+// ============================================================
+function submitBid() {
+  var price = parseFloat(document.getElementById('s-price').value);
+  var lots = parseInt(document.getElementById('s-lots').value);
+  var cfg = sConfig;
+  if (!price || price < cfg.floor || price > cfg.cap) {
+    alert('Price must be between \u20B9' + fmt(cfg.floor) + ' and \u20B9' + fmt(cfg.cap));
+    return;
+  }
+  if (!lots || lots < 1) { alert('Enter at least 1 lot.'); return; }
+  if (price * lots * cfg.lot > cfg.funds) { alert('Bid exceeds your available funds.'); return; }
+  setLoading('btn-submit-bid', true, 'Submitting\u2026');
+  dbSet('rooms/' + myRoomCode + '/bids/' + myStudentId, {
+    price: price, lots: lots, submittedAt: Date.now()
+  }).then(function() {
+    setLoading('btn-submit-bid', false, 'Submit bid &rarr;');
+    document.getElementById('student-bidding').style.display = 'none';
+    document.getElementById('student-submitted').style.display = 'block';
+    document.getElementById('submitted-summary').innerHTML =
+      '<p><strong>Bid price:</strong> \u20B9' + fmtD(price, 2) + '</p>' +
+      '<p><strong>Lots:</strong> ' + lots + ' (' + fmt(lots * cfg.lot) + ' shares)</p>' +
+      '<p><strong>Total bid amount:</strong> \u20B9' + fmt(price * lots * cfg.lot) + '</p>' +
+      '<p style="color:var(--muted);margin-top:6px;font-size:12px">You will pay the cut-off price, not your bid price.</p>';
+  }).catch(function(e) {
+    alert('Error submitting bid: ' + e.message);
+    setLoading('btn-submit-bid', false, 'Submit bid &rarr;');
+  });
+}
+
+// ============================================================
+// Student: phase listener (polling)
+// ============================================================
+function listenStudentPhase() {
+  _resultShown = false;
+  function poll() {
+    if (_resultShown) return;
+    dbGet('rooms/' + myRoomCode + '/config').then(function(cfg) {
+      if (!cfg) { setTimeout(poll, 4000); return; }
+      sConfig = cfg;
+
+      if (cfg.phase === 'results') {
+        if (_resultShown) return;
+        document.getElementById('student-waiting').style.display = 'block';
+        document.getElementById('student-bidding').style.display = 'none';
+        document.getElementById('student-submitted').style.display = 'none';
+        document.getElementById('student-waiting').querySelector('h2').textContent = 'Results ready! Loading\u2026';
+        Promise.all([
+          dbGet('rooms/' + myRoomCode + '/results'),
+          dbGet('rooms/' + myRoomCode + '/students'),
+          dbGet('rooms/' + myRoomCode + '/bids')
+        ]).then(function(vals) {
+          var results = vals[0]; var sObj = vals[1]; var bObj = vals[2];
+          if (!results) { setTimeout(poll, 2000); return; }
+          _resultShown = true;
+          var al = (results.allotments || {})[myStudentId];
+          var b = bObj ? bObj[myStudentId] : null;
+          var students = sObj ? Object.values(sObj) : [];
+          var bids = bObj || {};
+          document.getElementById('student-waiting').style.display = 'none';
+          if (al) {
+            showStudentResult(cfg, results, al, b, students, bids);
+          } else {
+            var dummy = {allotted:0,cost:0,refund:0,unused:cfg.funds,status:'no-bid',rank:students.length,totalWealth:cfg.funds};
+            showStudentResult(cfg, results, dummy, null, students, bids);
+          }
+        }).catch(function(){ setTimeout(poll, 2000); });
+        return;
+      }
+
+      if (cfg.phase === 'bidding') {
+        dbGet('rooms/' + myRoomCode + '/bids/' + myStudentId).then(function(submitted) {
+          if (submitted) {
+            document.getElementById('student-bidding').style.display = 'none';
+            document.getElementById('student-submitted').style.display = 'block';
+          } else {
+            showBiddingUI(cfg);
+          }
+        });
+      }
+    }).catch(function(e){ console.error('poll error', e); });
+    if (!_resultShown) setTimeout(poll, 4000);
+  }
+  poll();
+}
+
+// ============================================================
+// Student: show result
+// ============================================================
+function showStudentResult(cfg, results, al, b, students, bids) {
+  _resultShown = true;
+  document.getElementById('student-waiting').style.display = 'none';
+  document.getElementById('student-bidding').style.display = 'none';
+  document.getElementById('student-submitted').style.display = 'none';
+  document.getElementById('student-result').style.display = 'block';
+
+  var cp = results.cutoffPrice;
+  var box = al.status === 'full' ? 'good' : al.status === 'partial' ? 'warn' : 'bad';
+  var msg = al.status === 'full' ? 'Full allotment \u2014 congratulations!' :
+    al.status === 'partial' ? 'Partial allotment \u2014 IPO oversubscribed, shares allotted pro-rata' :
+    al.status === 'below-cutoff' ? 'Your bid (\u20B9' + fmtD(b ? b.price : 0, 2) + ') was below the cut-off (\u20B9' + fmtD(cp, 2) + ') \u2014 no allotment' :
+    'No bid placed \u2014 no allotment';
+
+  document.getElementById('student-result-content').innerHTML =
+    '<div class="result-box ' + box + '"><h3>' + msg + '</h3></div>' +
+    '<div class="metrics">' +
+    '<div class="metric"><div class="metric-label">Cut-off price</div><div class="metric-val">\u20B9' + fmtD(cp, 2) + '</div></div>' +
+    '<div class="metric"><div class="metric-label">Your bid price</div><div class="metric-val">\u20B9' + fmtD(b ? b.price : 0, 2) + '</div></div>' +
+    '<div class="metric"><div class="metric-label">Shares allotted</div><div class="metric-val">' + fmt(al.allotted || 0) + '</div></div>' +
+    '</div>' +
+    '<div class="metrics">' +
+    '<div class="metric"><div class="metric-label">Amount paid</div><div class="metric-val" style="font-size:16px">\u20B9' + fmt(al.cost || 0) + '</div><div class="metric-sub">At cut-off price</div></div>' +
+    '<div class="metric"><div class="metric-label">Refund</div><div class="metric-val" style="font-size:16px;color:var(--success)">\u20B9' + fmt(al.refund || 0) + '</div></div>' +
+    '<div class="metric"><div class="metric-label">Unused cash</div><div class="metric-val" style="font-size:16px">\u20B9' + fmt(al.unused != null ? al.unused : cfg.funds) + '</div></div>' +
+    '</div>' +
+    '<div class="card" style="background:var(--accent-bg);border-color:var(--accent-border)">' +
+    '<div class="metric-label">Your rank</div>' +
+    '<div style="font-size:48px;font-weight:700;color:var(--accent);text-align:center;padding:.5rem 0">' + (al.rank || '--') + '</div>' +
+    '<div style="text-align:center;color:var(--muted);font-size:13px">out of ' + students.length + ' students</div>' +
+    '</div>';
+
+  // Leaderboard
+  document.getElementById('student-leaderboard-section').style.display = 'block';
+  renderLeaderboard(cfg, results, students, bids, document.getElementById('student-lb-rows'));
+}
 </script>
 </body>
 </html>

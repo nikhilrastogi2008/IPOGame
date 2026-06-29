@@ -567,24 +567,38 @@ async function closeBookCalc(cfg, students, bids){
   // Step 2: Shares to be issued = target \u00F7 cut-off price (rounded to lot size)
   const totalShares=Math.floor(cfg.target/cutoffPrice/cfg.lot)*cfg.lot;
 
-  // Step 3: Allot shares from highest bid down
+  // Step 3: Allot shares from highest bid down, pro-rata within same price group
   let sharesRemaining=totalShares;
   const allottedMap={};
-  for(let i=0;i<sortedBids.length;i++){
-    const {student:s,bid:b}=sortedBids[i];
-    if(b.price<cutoffPrice){ allottedMap[s.id]=0; continue; }
-    const wanted=b.lots*cfg.lot;
-    if(sharesRemaining<=0){
-      allottedMap[s.id]=0;
-    } else if(wanted<=sharesRemaining){
-      allottedMap[s.id]=wanted;
-      sharesRemaining-=wanted;
+
+  // Group eligible bids by price (highest first)
+  const priceGroups=[];
+  sortedBids.filter(({bid:b})=>b.price>=cutoffPrice).forEach(({student:s,bid:b})=>{
+    const last=priceGroups[priceGroups.length-1];
+    if(last&&last.price===b.price) last.bids.push({s,b});
+    else priceGroups.push({price:b.price,bids:[{s,b}]});
+  });
+
+  for(const group of priceGroups){
+    if(sharesRemaining<=0){ group.bids.forEach(({s})=>allottedMap[s.id]=0); continue; }
+    const groupTotal=group.bids.reduce((sum,{b})=>sum+b.lots*cfg.lot,0);
+    if(groupTotal<=sharesRemaining){
+      // Full allotment for everyone in this price group
+      group.bids.forEach(({s,b})=>{ allottedMap[s.id]=b.lots*cfg.lot; });
+      sharesRemaining-=groupTotal;
     } else {
-      const partial=Math.floor(sharesRemaining/cfg.lot)*cfg.lot;
-      allottedMap[s.id]=partial;
+      // Pro-rata within this price group — everyone gets same fraction
+      const ratio=sharesRemaining/groupTotal;
+      group.bids.forEach(({s,b})=>{
+        const wanted=b.lots*cfg.lot;
+        const prorata=Math.floor(wanted*ratio/cfg.lot)*cfg.lot;
+        allottedMap[s.id]=prorata;
+      });
       sharesRemaining=0;
     }
   }
+  // Students who bid below cutoff or didn't bid get 0
+  sortedBids.filter(({bid:b})=>b.price<cutoffPrice).forEach(({student:s})=>allottedMap[s.id]=0);
   students.forEach(s=>{if(allottedMap[s.id]===undefined)allottedMap[s.id]=0;});
   const eligibleShares=Object.values(allottedMap).reduce((a,v)=>a+v,0);
   const ratio=totalShares>0?eligibleShares/totalShares:0;
@@ -778,89 +792,74 @@ async function joinGame(){
   listenStudentPhase();
 }
 
+function showBiddingUI(cfg){
+  if(document.getElementById('student-bidding').style.display==='block') return;
+  document.getElementById('student-waiting').style.display='none';
+  document.getElementById('student-submitted').style.display='none';
+  document.getElementById('student-bidding').style.display='block';
+  document.getElementById('s-company').textContent=cfg.company||'--';
+  document.getElementById('s-band').textContent='₹'+fmt(cfg.floor)+' – ₹'+fmt(cfg.cap);
+  document.getElementById('s-funds').textContent='₹'+fmt(cfg.funds);
+  const pe=document.getElementById('s-price');
+  if(!pe.dataset.init){pe.min=cfg.floor;pe.max=cfg.cap;pe.value=cfg.floor;pe.dataset.init='1';}
+  document.getElementById('s-price-hint').textContent='Between ₹'+fmt(cfg.floor)+' and ₹'+fmt(cfg.cap);
+  document.getElementById('s-lots-hint').textContent='1 lot = '+fmt(cfg.lot)+' shares · Max '+Math.floor(cfg.funds/(cfg.lot*cfg.floor))+' lots at floor price';
+  updateBidCalc();
+}
+
 async function listenStudentPhase(){
   await waitForDB();
-  const unsub=dbOn(`rooms/${myRoomCode}/config`, cfg=>{
-    if(!cfg) return;
-    sConfig=cfg;
-    if(cfg.phase==='results'){
-      if(_studentResultShown) return; // already showing results, don't re-render
-      document.getElementById('student-waiting').style.display='block';
-      document.getElementById('student-submitted').style.display='none';
-      document.getElementById('student-waiting').querySelector('h2').textContent='Results are ready! Loading…';
+  let _resultShown = false;
+  async function poll(){
+    if(_resultShown) return;
+    try {
+      const cfg = await dbGet(`rooms/${myRoomCode}/config`);
+      if(!cfg){ setTimeout(poll, 4000); return; }
+      sConfig = cfg;
 
-      function fetchAndShowResults(retries){
-        Promise.all([
+      if(cfg.phase === 'results'){
+        if(_resultShown) return;
+        document.getElementById('student-waiting').style.display='block';
+        document.getElementById('student-submitted').style.display='none';
+        document.getElementById('student-waiting').querySelector('h2').textContent='Results ready! Loading…';
+        const [results, sObj, bObj] = await Promise.all([
           dbGet(`rooms/${myRoomCode}/results`),
           dbGet(`rooms/${myRoomCode}/students`),
           dbGet(`rooms/${myRoomCode}/bids`)
-        ]).then(([results,sObj,bObj])=>{
-          if(!results){
-            // Results not written yet \u2014 retry up to 5 times
-            if(retries>0) setTimeout(()=>fetchAndShowResults(retries-1), 1500);
-            return;
-          }
-          const al=(results.allotments||{})[myStudentId];
-          const b=bObj?bObj[myStudentId]:null;
-          const students=sObj?Object.values(sObj):[];
-          const bids=bObj||{};
-          document.getElementById('student-waiting').style.display='none';
-          if(al) showStudentResult(cfg,results,al,b,students,bids);
-          else {
-            const dummyAl={allotted:0,cost:0,refund:0,unused:cfg.funds,
-              status:'no-bid',rank:students.length,
-              totalWealth:cfg.funds+cfg.funds*(cfg.rate/100)*(cfg.period/12)};
-            showStudentResult(cfg,results,dummyAl,null,students,bids);
-          }
-        }).catch(e=>{
-          if(retries>0) setTimeout(()=>fetchAndShowResults(retries-1), 2000);
-        });
+        ]);
+        if(!results){ setTimeout(poll, 2000); return; }
+        const al=(results.allotments||{})[myStudentId];
+        const b=bObj?bObj[myStudentId]:null;
+        const students=sObj?Object.values(sObj):[];
+        const bids=bObj||{};
+        document.getElementById('student-waiting').style.display='none';
+        _resultShown = true;
+        if(al){
+          showStudentResult(cfg,results,al,b,students,bids);
+        } else {
+          const dummyAl={allotted:0,cost:0,refund:0,unused:cfg.funds,
+            status:'no-bid',rank:students.length,totalWealth:cfg.funds};
+          showStudentResult(cfg,results,dummyAl,null,students,bids);
+        }
+        return;
       }
-      fetchAndShowResults(5);
-      return;
-    }
-    if(cfg.phase==='bidding'){
-      document.getElementById('student-waiting').style.display='none';
-      // Check if already submitted
-      dbGet(`rooms/${myRoomCode}/bids/${myStudentId}`).then(bid=>{
-        if(bid){
+
+      if(cfg.phase === 'bidding'){
+        document.getElementById('student-waiting').style.display='none';
+        const submitted = await dbGet(`rooms/${myRoomCode}/bids/${myStudentId}`);
+        if(submitted){
           document.getElementById('student-bidding').style.display='none';
           document.getElementById('student-submitted').style.display='block';
         } else {
           showBiddingUI(cfg);
         }
-      });
-    }
-  });
-  unsubListeners.push(unsub);
+      }
+    } catch(e){ console.error('poll error', e); }
+    setTimeout(poll, 4000);
+  }
+  poll();
 }
 
-function showBiddingUI(cfg){
-  document.getElementById('student-waiting').style.display='none';
-  document.getElementById('student-bidding').style.display='block';
-  document.getElementById('s-company').textContent=cfg.company;
-  document.getElementById('s-band').textContent=`\u20B9${fmt(cfg.floor)} \u2013 \u20B9${fmt(cfg.cap)}`;
-  document.getElementById('s-funds').textContent=`\u20B9${fmt(cfg.funds)}`;
-  const pe=document.getElementById('s-price');
-  if(!pe.dataset.init){pe.min=cfg.floor;pe.max=cfg.cap;pe.value=cfg.floor;pe.dataset.init='1';}
-  document.getElementById('s-price-hint').textContent=`Enter between \u20B9${fmt(cfg.floor)} and \u20B9${fmt(cfg.cap)}`;
-  document.getElementById('s-lots-hint').textContent=`1 lot = ${fmt(cfg.lot)} shares \u00B7 Max ${Math.floor(cfg.funds/(cfg.lot*cfg.floor))} lots at floor price (budget limit)`;
-  updateBidCalc();
-}
-
-function updateBidCalc(){
-  const cfg=sConfig; if(!cfg)return;
-  const price=parseFloat(document.getElementById('s-price').value)||0;
-  const lots=parseInt(document.getElementById('s-lots').value)||0;
-  const shares=lots*cfg.lot, cost=shares*price, rem=cfg.funds-cost;
-  document.getElementById('bc-shares').textContent=fmt(shares);
-  document.getElementById('bc-cost').textContent=`\u20B9${fmt(cost)}`;
-  document.getElementById('bc-rem').textContent=rem>=0?`\u20B9${fmt(rem)}`:'\u26A0\uFE0F Over budget';
-  document.getElementById('bc-rem').style.color=rem<0?'var(--danger)':'var(--success)';
-  const be=document.getElementById('bid-error');
-  if(rem<0){be.textContent='Bid exceeds your available funds.';be.style.display='block';}
-  else be.style.display='none';
-}
 
 async function submitBid(){
   const cfg=sConfig; if(!cfg)return;

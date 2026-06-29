@@ -731,6 +731,8 @@ function showFinalResults(cfg, results, students, bids) {
       '<span class="badge b-muted">No bid</span>';
     return '<tr><td><strong>' + (a.rank || '--') + '</strong></td><td>' + s.name + '</td>' +
       '<td>\u20B9' + fmtD(b.price || 0, 2) + '</td>' +
+      '<td>' + (b.lots || '--') + '</td>' +
+      '<td>' + (b.lots ? fmt(b.lots * cfg.lot) : '--') + '</td>' +
       '<td>' + fmt(a.allotted || 0) + '</td>' +
       '<td>\u20B9' + fmt(a.cost || 0) + '</td>' +
       '<td>\u20B9' + fmt(a.refund || 0) + '</td>' +
@@ -741,7 +743,7 @@ function showFinalResults(cfg, results, students, bids) {
 
   document.getElementById('final-table').innerHTML =
     '<div class="table-wrap"><table><thead><tr>' +
-    '<th>Rank</th><th>Student</th><th>Bid price</th><th>Allotted</th>' +
+    '<th>Rank</th><th>Student</th><th>Bid price</th><th>Bid lots</th><th>Bid shares</th><th>Allotted</th>' +
     '<th>Amount paid</th><th>Refund</th><th>Unused cash</th><th>Total wealth</th><th>Status</th>' +
     '</tr></thead><tbody>' + trows + '</tbody></table></div>';
 

@@ -808,19 +808,19 @@ function renderLeaderboard(cfg, results, students, bids, el) {
   el.innerHTML = ranked.map(function(s, i) {
     var a = al[s.id] || {};
     var rank = a.rank || i + 1;
-    var medal = rank === 1 ? '\U0001F947' : rank === 2 ? '\U0001F948' : rank === 3 ? '\U0001F949' : rank;
+    var medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
     var cls = rank <= 3 ? ' rank-' + rank : '';
     var mp = results.marketPrice;
     var wealth = a.totalWealth || 0;
     var detail = mp
       ? ('\u20B9' + fmt((a.allotted||0)*mp) + ' market value + \u20B9' + fmt(a.unused!=null?a.unused:cfg.funds) + ' cash')
       : ('\u20B9' + fmt(a.cost||0) + ' invested + \u20B9' + fmt(a.unused!=null?a.unused:cfg.funds) + ' cash');
-    return '<div class="lb-row' + cls + '">' +
-      '<div class="lb-rank">' + medal + '</div>' +
-      '<div style="flex:1"><div class="lb-name">' + s.name + '</div>' +
-      '<div class="lb-detail">' + detail + '</div></div>' +
-      '<div style="text-align:right"><div class="lb-wealth">\u20B9' + fmt(wealth) + '</div>' +
-      '<div class="lb-sub">Total wealth</div></div></div>';
+    return '<div class="lb-row' + cls + '" style="display:flex;align-items:center;gap:12px">' +
+      '<div style="font-size:26px;width:44px;text-align:center;flex-shrink:0">' + medal + '</div>' +
+      '<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + s.name + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + detail + '</div></div>' +
+      '<div style="text-align:right;flex-shrink:0;margin-left:8px"><div style="font-size:18px;font-weight:700;color:var(--accent)">\u20B9' + fmt(wealth) + '</div>' +
+      '<div style="font-size:11px;color:var(--muted)">Total wealth</div></div></div>';
   }).join('');
 }
 

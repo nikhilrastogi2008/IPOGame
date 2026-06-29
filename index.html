@@ -256,6 +256,14 @@ h3{font-size:14px;font-weight:600;margin-bottom:8px}
         <div class="progress-outer"><div class="progress-inner" id="bid-progress-bar" style="width:0%"></div></div>
       </div>
       <div class="card">
+        <div class="section-label">Order book</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+          <span id="book-label" style="color:var(--muted)">0 shares bid</span>
+          <span id="book-pct" style="font-weight:600">--</span>
+        </div>
+        <div class="progress-outer"><div class="progress-inner" id="book-bar" style="width:0%"></div></div>
+      </div>
+      <div class="card">
         <h3 style="margin-bottom:12px">Student bid status</h3>
         <div id="bid-status-rows"></div>
       </div>
@@ -561,6 +569,28 @@ function pollBids() {
       return '<div class="student-row"><div class="avatar">' + s.name[0].toUpperCase() + '</div><span style="font-size:14px;flex:1">' + s.name + '</span>' + badge + '</div>';
     }).join('');
     document.getElementById('bid-status-rows').innerHTML = rows;
+    // Order book subscription
+    var totalBidShares = 0;
+    var totalBidAmount = 0;
+    students.forEach(function(s) {
+      var b = bids[s.id];
+      if (b && b.lots) {
+        totalBidShares += b.lots * cfg.lot;
+        totalBidAmount += b.lots * cfg.lot * b.price;
+      }
+    });
+    var estShares = cfg && cfg.target && cfg.floor ? Math.floor(cfg.target / cfg.floor / cfg.lot) * cfg.lot : 1;
+    var subX = estShares > 0 ? totalBidShares / estShares : 0;
+    var bookLabel = document.getElementById('book-label');
+    var bookPct = document.getElementById('book-pct');
+    var bookBar = document.getElementById('book-bar');
+    if (bookLabel) bookLabel.textContent = fmt(totalBidShares) + ' shares bid (est. ' + fmt(estShares) + ' to be issued at floor)';
+    if (bookPct) bookPct.textContent = fmtD(subX, 2) + 'x subscribed';
+    if (bookBar) {
+      bookBar.style.width = Math.min(subX * 100, 100) + '%';
+      bookBar.className = 'progress-inner' + (subX > 1 ? ' over' : '');
+    }
+
     // Enable close book when at least one bid
     document.getElementById('btn-close-book').disabled = submitted === 0;
   });

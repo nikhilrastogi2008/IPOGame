@@ -792,6 +792,27 @@ async function joinGame(){
   listenStudentPhase();
 }
 
+function updateBidCalc(){
+  const price=parseFloat(document.getElementById('s-price').value)||0;
+  const lots=parseInt(document.getElementById('s-lots').value)||0;
+  const lotHint=document.getElementById('s-lots-hint').textContent;
+  const lotMatch=lotHint.match(/1 lot = ([\d,]+)/);
+  const lotSize=lotMatch?parseInt(lotMatch[1].replace(/,/g,'')):100;
+  const fundsEl=document.getElementById('s-funds');
+  const fundsText=fundsEl?fundsEl.textContent.replace(/[^\d]/g,''):'0';
+  const funds=parseInt(fundsText)||0;
+  const shares=lots*lotSize;
+  const cost=shares*price;
+  const rem=funds-cost;
+  document.getElementById('bc-shares').textContent=fmt(shares);
+  document.getElementById('bc-cost').textContent='₹'+fmt(cost);
+  document.getElementById('bc-rem').textContent=rem>=0?'₹'+fmt(rem):'⚠️ Over budget';
+  document.getElementById('bc-rem').style.color=rem<0?'var(--danger)':'var(--success)';
+  const be=document.getElementById('bid-error');
+  if(rem<0){be.textContent='Bid exceeds your available funds.';be.style.display='block';}
+  else be.style.display='none';
+}
+
 function showBiddingUI(cfg){
   if(document.getElementById('student-bidding').style.display==='block') return;
   document.getElementById('student-waiting').style.display='none';

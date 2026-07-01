@@ -657,12 +657,31 @@ function closeBook() {
         group.members.forEach(function(x){ allottedMap[x.student.id] = x.bid.lots * cfg.lot; });
         sharesRemaining -= groupTotal;
       } else {
-        // Pro-rata: everyone gets same fraction of their bid
+        // Pro-rata: everyone gets same fraction of their bid, rounded down to lot size
         var ratio = sharesRemaining / groupTotal;
+        var lotsAllotted = 0;
         group.members.forEach(function(x) {
-          var wanted = x.bid.lots * cfg.lot;
-          allottedMap[x.student.id] = Math.floor(wanted * ratio / cfg.lot) * cfg.lot;
+          var wantedLots = x.bid.lots;
+          var prorataLots = Math.floor(wantedLots * ratio);
+          allottedMap[x.student.id] = prorataLots * cfg.lot;
+          lotsAllotted += prorataLots;
         });
+        var lotsRemaining = Math.floor(sharesRemaining / cfg.lot) - lotsAllotted;
+        // Distribute leftover lots (from rounding) one at a time via lottery,
+        // to members who still want more and haven't received their full bid
+        if (lotsRemaining > 0) {
+          var eligible = group.members.filter(function(x) {
+            return (allottedMap[x.student.id] / cfg.lot) < x.bid.lots;
+          });
+          // Shuffle for fair lottery
+          for (var i = eligible.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = eligible[i]; eligible[i] = eligible[j]; eligible[j] = tmp;
+          }
+          for (var k = 0; k < lotsRemaining && k < eligible.length; k++) {
+            allottedMap[eligible[k].student.id] += cfg.lot;
+          }
+        }
         sharesRemaining = 0;
       }
     });
